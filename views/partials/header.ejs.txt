@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Forum | Notes Sharing</title>
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS with custom config -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#6366F1',
+            secondary: '#4F46E5'
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-50 text-gray-800 font-sans">
+  <nav class="bg-white shadow-lg">
+    <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
+      <a href="/" class="text-2xl font-bold text-gray-800 hover:text-primary">ZHCET AMU</a>
+      <ul class="flex space-x-4 text-gray-600">
+        <li><a href="/" class="hover:text-gray-800">Home</a></li>
+        <li><a href="/forum" class="text-primary font-semibold">Forum</a></li>
+      </ul>
+    </div>
+  </nav>
+  <main class="min-h-screen py-8">

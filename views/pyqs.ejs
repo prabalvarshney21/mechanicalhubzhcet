@@ -1,0 +1,48 @@
+<%- include('partials/header') %>
+
+<% /* Page Hero - dynamic title */ %>
+<% if (typeof year === 'undefined') { %>
+<section class="hero bg-gradient-to-br from-black to-blue-900 text-white py-16 px-4 text-center">
+  <h1 class="text-4xl font-bold mb-4">PYQs</h1>
+  <p class="text-lg max-w-3xl mx-auto">Access extensive collections of past exam papers for effective preparation.</p>
+</section>
+<% } else { %>
+<section class="hero bg-gradient-to-br from-black to-blue-900 text-white py-16 px-4 text-center">
+  <h1 class="text-4xl font-bold mb-4"><%= year.charAt(0).toUpperCase() + year.slice(1) %> Year PYQs</h1>
+  <p class="text-lg max-w-3xl mx-auto">Select your semester to view the papers.</p>
+</section>
+<% } %>
+
+<% /* Dynamic Selection Section */ %>
+<section class="py-12 px-4 bg-black text-white text-center">
+  <h2 class="text-3xl font-semibold mb-6 text-blue-400">
+    <% if (typeof year === 'undefined') { %>
+      Select Your Year
+    <% } else if (typeof sem === 'undefined') { %>
+      Select Semester – <%= year.charAt(0).toUpperCase() + year.slice(1) %> Year
+    <% } else { %>
+      Select Subject – <%= year.charAt(0).toUpperCase() + year.slice(1) %> Year, <%= sem.replace('sem','Sem ') %>
+    <% } %>
+  </h2>
+  <div class="flex flex-col sm:flex-row justify-center gap-4">
+    <% if (typeof year === 'undefined') { %>
+      <a href="/pyqs/2nd" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-lg text-white">2nd Year</a>
+      <a href="/pyqs/3rd" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-lg text-white">3rd Year</a>
+      <a href="/pyqs/4th" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-lg text-white">4th Year</a>
+    <% } else if (typeof sem === 'undefined') { %>
+      <% semesters[year].forEach(semItem => { %>
+        <a href="/pyqs/<%= year %>/<%= semItem %>" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-lg text-white">
+          <%= semItem.replace('sem','Sem ') %>
+        </a>
+      <% }) %>
+    <% } else { %>
+      <% subjects[sem].forEach(subject => { %>
+        <a href="/pyqs/<%= year %>/<%= sem %>/<%= encodeURIComponent(subject) %>" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-lg text-white">
+          <%= subject %>
+        </a>
+      <% }) %>
+    <% } %>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

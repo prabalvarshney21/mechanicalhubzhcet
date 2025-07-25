@@ -1,0 +1,14 @@
+<%- include('../partials/header') %>
+<div class="main-container">
+  <h2><%= year %> Year – <%= sem.toUpperCase() %> – <%= subject %> PYQs</h2>
+  <% if(files.length){ %>
+    <ul class="file-list">
+      <% files.forEach(f=>{ %>
+        <li><a href="/uploads/pyqs/<%= year %>/<%= sem %>/<%= subject %>/<%= f %>" target="_blank"><%= f %></a></li>
+      <% }) %>
+    </ul>
+  <% } else { %>
+    <p>No PYQs uploaded yet.</p>
+  <% } %>
+</div>
+<%- include('../partials/footer') %>

@@ -1,0 +1,70 @@
+<%- include('../partials/header') %>
+
+<% /* Handle upload for notes (type=notes) */ %>
+<% if (type === 'notes') { %>
+
+  <% /* Step 1: Year & Semester selection */ %>
+  <% if (!year || !sem) { %>
+    <h2 class="mt-4">Upload Notes: Select Year & Semester</h2>
+    <div class="flex flex-wrap gap-4 mt-2">
+      <% years.forEach(y => { %>
+        <div>
+          <h3 class="font-bold"><%= y.charAt(0).toUpperCase() + y.slice(1) %> Year</h3>
+          <div class="space-x-2 mt-1">
+            <% semesters[y].forEach(s => { %>
+              <a href="/admin/upload?type=notes&year=<%= y %>&sem=<%= s %>" class="btn btn-primary"><%= s.toUpperCase() %></a>
+            <% }) %>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+
+  <% /* Step 2: Subject selection */ %>
+  <% } else if (!subject) { %>
+    <h2 class="mt-4">Upload Notes: <%= year.charAt(0).toUpperCase()+year.slice(1) %> - <%= sem.toUpperCase() %> Subjects</h2>
+    <div class="grid grid-cols-2 gap-4 mt-2">
+      <% subjects[sem].forEach(sub => { %>
+        <div class="p-4 border rounded-lg shadow-sm">
+          <h4 class="font-semibold mb-1"><%= sub %></h4>
+          <div class="flex space-x-2">
+            <a href="/admin/upload?type=notes&year=<%= year %>&sem=<%= sem %>&subject=<%= encodeURIComponent(sub) %>" class="btn btn-secondary">
+              Select Subject
+            </a>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+
+  <% /* Step 3: Unit selection */ %>
+  <% } else if (!unit) { %>
+    <h2 class="mt-4">Upload Notes: <%= year.charAt(0).toUpperCase()+year.slice(1) %> - <%= sem.toUpperCase() %> - <%= subject %></h2>
+    <div class="flex space-x-2 mt-2">
+      <% for (let i = 1; i <= 4; i++) { %>
+        <a href="/admin/upload?type=notes&year=<%= year %>&sem=<%= sem %>&subject=<%= encodeURIComponent(subject) %>&unit=unit<%= i %>" class="btn btn-secondary">
+          Unit <%= i %>
+        </a>
+      <% } %>
+    </div>
+
+  <% /* Step 4: File upload form */ %>
+  <% } else { %>
+    <h2 class="mt-4">Upload File for <%= year.charAt(0).toUpperCase()+year.slice(1) %> - <%= sem.toUpperCase() %> - <%= subject %> - <%= unit.replace('unit','Unit ') %></h2>
+    <form action="/admin/upload" method="POST" enctype="multipart/form-data" class="mt-4">
+      <input type="hidden" name="type" value="notes">
+      <input type="hidden" name="year" value="<%= year %>">
+      <input type="hidden" name="sem" value="<%= sem %>">
+      <input type="hidden" name="subject" value="<%= subject %>">
+      <input type="hidden" name="unit" value="<%= unit %>">
+
+      <div class="form-group">
+        <label class="block mb-1">Select File for <%= unit.replace('unit','Unit ') %></label>
+        <input type="file" name="file" class="border p-2 w-full">
+      </div>
+
+      <button type="submit" class="btn btn-success mt-2">Upload</button>
+    </form>
+  <% } %>
+
+<% } %>
+
+<%- include('../partials/footer') %>

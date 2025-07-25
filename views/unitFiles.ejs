@@ -1,0 +1,21 @@
+<%- include('partials/header') %>
+
+<div class="main-container px-6 py-8">
+  <h2 class="text-2xl font-semibold mb-6">Semester <%= sem %> — <%= unit.replace('unit','Unit ') %> — <%= subject %></h2>
+
+  <% if (!files || files.length === 0) { %>
+    <p class="mt-4">No files uploaded yet for this unit.</p>
+  <% } else { %>
+    <ul class="mt-4 list-disc list-inside">
+      <% files.forEach(file => { %>
+        <li class="mb-2">
+          <a href="/uploads/notes/<%= year %>/<%= sem %>/<%= encodeURIComponent(subject) %>/<%= unit %>/<%= file %>" download onclick="alert('Notes downloaded successfully');" class="text-blue-600 underline">
+            <%= file %>
+          </a>
+        </li>
+      <% }) %>
+    </ul>
+  <% } %>
+</div>
+
+<%- include('partials/footer') %>

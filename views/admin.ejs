@@ -1,0 +1,26 @@
+<%- include('partials/header') %>
+
+<!-- Hero Banner -->
+<section class="hero bg-gradient-to-br from-black to-blue-900 text-white py-16 px-4 text-center">
+  <h1 class="text-4xl lg:text-5xl font-bold mb-4">Admin Dashboard</h1>
+  <p class="text-lg lg:text-xl max-w-3xl mx-auto mb-8">
+    Welcome to the Admin Panel. Here you can upload lecture notes, PYQs, and manage forum content to keep the site up to date.
+  </p>
+</section>
+
+<!-- Action Buttons -->
+<section class="bg-black py-12 px-4">
+  <div class="max-w-4xl mx-auto flex flex-wrap justify-center gap-6">
+    <a href="/upload?type=notes" class="px-8 py-4 bg-blue-800 hover:bg-blue-700 rounded-2xl text-white text-lg shadow-lg">
+      Upload Notes
+    </a>
+    <a href="/upload?type=pyqs" class="px-8 py-4 bg-blue-800 hover:bg-blue-700 rounded-2xl text-white text-lg shadow-lg">
+      Upload PYQs
+    </a>
+    <a href="/admin/forum" class="px-8 py-4 bg-blue-800 hover:bg-blue-700 rounded-2xl text-white text-lg shadow-lg">
+      Manage Forum
+    </a>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

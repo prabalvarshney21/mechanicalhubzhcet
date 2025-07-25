@@ -1,0 +1,13 @@
+{
+  "posts": [
+    {
+      "_id": 6,
+      "username": "",
+      "text": "boss",
+      "files": [],
+      "createdAt": "2025-07-21T02:50:05.966Z",
+      "comments": []
+    }
+  ],
+  "nextId": 11
+}

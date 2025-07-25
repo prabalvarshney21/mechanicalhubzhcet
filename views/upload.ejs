@@ -1,0 +1,101 @@
+<%- include('partials/header') %>
+<div class="main-container py-12 px-4 max-w-xl mx-auto">
+  <h2 class="text-3xl font-semibold mb-6 text-center capitalize"><%= type %> Upload</h2>
+  <% if (error) { %>
+    <div class="bg-red-500 text-white p-4 rounded mb-4"><%= error %></div>
+  <% } %>
+  <% if (success) { %>
+    <div class="bg-green-500 text-white p-4 rounded mb-4"><%= success %></div>
+  <% } %>
+  <form action="/upload" method="POST" enctype="multipart/form-data" class="space-y-4">
+    <input type="hidden" name="type" value="<%= type %>">
+    <div>
+      <label class="block mb-1">Year</label>
+      <select name="year" required class="w-full px-3 py-2 bg-gray-800 text-white rounded">
+        <option value="">Select Year</option>
+        <% years.forEach(y => { %>
+          <option value="<%= y %>" <%= year === y ? 'selected' : '' %>><%= y %> Year</option>
+        <% }) %>
+      </select>
+    </div>
+    <div>
+      <label class="block mb-1">Semester</label>
+      <select name="sem" required class="w-full px-3 py-2 bg-gray-800 text-white rounded">
+        <option value="">Select Semester</option>
+        <% if (year) { semesters[year].forEach(s => { %>
+          <option value="<%= s %>" <%= sem === s ? 'selected' : '' %>><%= s.replace(/sem/, 'Sem ') %></option>
+        <% }) } %>
+      </select>
+    </div>
+    <% if (type === 'notes' || type === 'pyqs') { %>
+    <div>
+      <label class="block mb-1">Subject</label>
+      <select name="subject" required class="w-full px-3 py-2 bg-gray-800 text-white rounded">
+        <option value="">Select Subject</option>
+        <% if (sem) { subjects[sem].forEach(sub => { %>
+          <option value="<%= sub %>" <%= subject === sub ? 'selected' : '' %>><%= sub %></option>
+        <% }) } %>
+      </select>
+    </div>
+    <% } %>
+    <% if (type === 'notes') { %>
+    <div>
+      <label class="block mb-1">Unit (optional)</label>
+      <input type="number" name="unit" min="1" max="10" value="<%= unit || '' %>" placeholder="e.g. 1" class="w-full px-3 py-2 bg-gray-800 text-white rounded">
+    </div>
+    <% } %>
+    <div>
+      <label class="block mb-1">Files</label>
+      <input type="file" name="files" multiple required class="w-full text-white">
+    </div>
+    <div class="text-center">
+      <button type="submit" class="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded">Upload</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  // Dynamic cascading selects
+  const semestersData = <%- JSON.stringify(semesters) %>;
+  const subjectsData = <%- JSON.stringify(subjects) %>;
+
+  const yearSelect = document.querySelector('select[name="year"]');
+  const semSelect = document.querySelector('select[name="sem"]');
+  const subjectSelect = document.querySelector('select[name="subject"]');
+
+  yearSelect.addEventListener('change', () => {
+    const year = yearSelect.value;
+    // Populate semesters
+    semSelect.innerHTML = '<option value="">Select Semester</option>';
+    if (semestersData[year]) {
+      semestersData[year].forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s;
+        opt.textContent = s.replace(/sem/, 'Sem ');
+        semSelect.appendChild(opt);
+      });
+    }
+    // Clear subjects
+    if (subjectSelect) {
+      subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+    }
+  });
+
+  if (semSelect) {
+    semSelect.addEventListener('change', () => {
+      const sem = semSelect.value;
+      if (subjectSelect) {
+        subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+        if (subjectsData[sem]) {
+          subjectsData[sem].forEach(sub => {
+            const opt = document.createElement('option');
+            opt.value = sub;
+            opt.textContent = sub;
+            subjectSelect.appendChild(opt);
+          });
+        }
+      }
+    });
+  }
+</script>
+<%- include('partials/footer') %>

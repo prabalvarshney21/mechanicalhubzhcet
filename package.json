@@ -1,0 +1,19 @@
+{
+  "name": "notes-sharing-website",
+  "version": "1.1.0",
+  "description": "Notes sharing site with admin uploads, in-memory forum, and image uploads",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "multer": "^2.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}

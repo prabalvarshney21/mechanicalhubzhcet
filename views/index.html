@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Attendance Calculator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+  <div class="container mx-auto p-6 space-y-8">
+    <header class="text-center">
+      <h1 class="text-4xl font-bold mb-2">Smart Attendance Calculator</h1>
+      <p class="text-gray-500">Track and manage your attendance effortlessly</p>
+    </header>
+    <section id="summary" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="bg-white p-4 rounded-lg shadow flex flex-col items-center">
+        <span class="text-sm uppercase text-gray-500">Total Classes Held</span>
+        <span id="total-classes" class="text-2xl font-semibold">0</span>
+      </div>
+      <div class="bg-white p-4 rounded-lg shadow flex flex-col items-center">
+        <span class="text-sm uppercase text-gray-500">Total Present</span>
+        <span id="total-present" class="text-2xl font-semibold">0</span>
+      </div>
+      <div class="bg-white p-4 rounded-lg shadow flex flex-col items-center">
+        <span class="text-sm uppercase text-gray-500">Attendance Rate</span>
+        <span id="attendance-rate" class="text-2xl font-semibold">0%</span>
+      </div>
+      <div class="bg-white p-4 rounded-lg shadow flex flex-col items-center">
+        <span class="text-sm uppercase text-gray-500">Subjects</span>
+        <span id="subject-count" class="text-2xl font-semibold">0</span>
+      </div>
+    </section>
+    <section id="subjects" class="bg-white p-6 rounded-lg shadow space-y-4">
+      <h2 class="text-2xl font-semibold">Subjects</h2>
+      <form id="add-subject-form" class="flex space-x-2">
+        <input type="text" id="subject-name" placeholder="Subject Name" class="flex-grow border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Add Subject</button>
+      </form>
+      <ul id="subject-list" class="divide-y divide-gray-200">
+        <li class="text-center text-gray-500 py-2">No subjects added</li>
+      </ul>
+    </section>
+    <section id="record" class="bg-white p-6 rounded-lg shadow space-y-4">
+      <h2 class="text-2xl font-semibold">Record Attendance</h2>
+      <form id="record-form" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+        <div>
+          <label class="block text-sm font-medium">Subject</label>
+          <select id="subject-select" class="mt-1 block w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+            <option value="">Select a subject</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Class Held?</label>
+          <div class="mt-1 flex items-center space-x-4">
+            <label><input type="radio" name="class-held" value="yes" class="mr-2">Yes</label>
+            <label><input type="radio" name="class-held" value="no" class="mr-2">No</label>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Attendance Status</label>
+          <div class="mt-1 flex items-center space-x-4">
+            <label><input type="radio" name="status" value="Present" class="mr-2">Present</label>
+            <label><input type="radio" name="status" value="Absent" class="mr-2">Absent</label>
+          </div>
+        </div>
+        <div>
+          <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 w-full">Record Attendance</button>
+        </div>
+      </form>
+    </section>
+    <section id="statistics" class="bg-white p-6 rounded-lg shadow space-y-4">
+      <h2 class="text-2xl font-semibold">Subject Statistics</h2>
+      <div id="subject-stats"><p class="text-center text-gray-500">No subject data</p></div>
+    </section>
+    <section id="records" class="bg-white p-6 rounded-lg shadow space-y-4">
+      <h2 class="text-2xl font-semibold">Attendance Records</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium">Filter by Subject</label>
+          <select id="filter-subject" class="mt-1 block w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"><option value="">All Subjects</option></select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Filter by Month</label>
+          <select id="filter-month" class="mt-1 block w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+            <option value="">All Months</option><option value="1">January</option><option value="2">February</option><option value="3">March</option><option value="4">April</option><option value="5">May</option><option value="6">June</option><option value="7">July</option><option value="8">August</option><option value="9">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option>
+          </select>
+        </div>
+      </div>
+      <table class="min-w-full divide-y divide-gray-200 mt-4"><thead class="bg-gray-50"><tr><th class="px-4 py-2 text-left text-xs font-medium uppercase">Date</th><th class="px-4 py-2 text-left text-xs font-medium uppercase">Subject</th><th class="px-4 py-2 text-left text-xs font-medium uppercase">Held</th><th class="px-4 py-2 text-left text-xs font-medium uppercase">Status</th><th class="px-4 py-2 text-left text-xs font-medium uppercase">Actions</th></tr></thead><tbody id="records-body" class="bg-white divide-y divide-gray-200"><tr><td colspan="5" class="text-center py-4 text-gray-500">No attendance records</td></tr></tbody></table>
+    </section>
+    <section id="data-mgmt" class="bg-white p-6 rounded-lg shadow text-center">
+      <button id="clear-data" class="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600">Clear All Data</button>
+    </section>
+    <footer class="text-center text-gray-500 mt-8">Made by Prabal </footer>
+  </div>
+  <script>
+    const getSubjects = () => JSON.parse(localStorage.getItem('subjects') || '[]');
+    const getRecords = () => JSON.parse(localStorage.getItem('records') || '[]');
+    const saveSubjects = subs => localStorage.setItem('subjects', JSON.stringify(subs));
+    const saveRecords = recs => localStorage.setItem('records', JSON.stringify(recs));
+    function updateSummary() {
+      const records = getRecords();
+      const held = records.filter(r => r.classHeld).length;
+      const present = records.filter(r => r.classHeld && r.status === 'Present').length;
+      const rate = held > 0 ? Math.round((present / held) * 100) : 0;
+      document.getElementById('total-classes').textContent = held;
+      document.getElementById('total-present').textContent = present;
+      document.getElementById('attendance-rate').textContent = rate + '%';
+      document.getElementById('subject-count').textContent = getSubjects().length;
+    }
+    function renderSubjects() {
+      const subjects = getSubjects();
+      const list = document.getElementById('subject-list');
+      const select = document.getElementById('subject-select');
+      const filter = document.getElementById('filter-subject');
+      list.innerHTML = '';
+      select.innerHTML = '<option value="">Select a subject</option>';
+      filter.innerHTML = '<option value="">All Subjects</option>';
+      if (subjects.length === 0) {
+        list.innerHTML = '<li class="text-center text-gray-500 py-2">No subjects added</li>';
+      } else {
+        subjects.forEach(sub => {
+          const li = document.createElement('li');
+          li.className = 'flex justify-between items-center py-2';
+          li.innerHTML = `<span>${sub}</span><button class="text-red-500 hover:text-red-700" data-sub>${sub}</button>`;
+          li.querySelector('button').addEventListener('click', () => deleteSubject(sub));
+          list.appendChild(li);
+          [select, filter].forEach(el => {
+            const opt = document.createElement('option');
+            opt.value = el===select? sub: sub;
+            opt.textContent = sub;
+            el.appendChild(opt);
+          });
+        });
+      }
+    }
+    function renderStats() {
+      const stats = document.getElementById('subject-stats');
+      stats.innerHTML = '';
+      const subs = getSubjects(); if (subs.length===0) {stats.innerHTML='<p class="text-center text-gray-500">No subject data</p>'; return;}
+      const table = document.createElement('table'); table.className='min-w-full text-left';
+      table.innerHTML=`<thead><tr><th class="py-2">Subject</th><th class="py-2">Held</th><th class="py-2">Present</th><th class="py-2">Rate</th></tr></thead>`;
+      const tbody=document.createElement('tbody'); const recs=getRecords();
+      subs.forEach(sub=>{const rs=recs.filter(r=>r.subject===sub&&r.classHeld),held=rs.length,p=res=rs.filter(r=>r.status==='Present').length,rate=held>0?Math.round(p/held*100):0;const tr=document.createElement('tr');tr.className='border-t';tr.innerHTML=`<td class="py-2">${sub}</td><td class="py-2">${held}</td><td class="py-2">${p}</td><td class="py-2">${rate}%</td>`;tbody.appendChild(tr);});
+      table.appendChild(tbody);stats.appendChild(table);
+    }
+    function renderRecords() {
+      const tbody = document.getElementById('records-body');
+      const subFilter = document.getElementById('filter-subject').value;
+      const monFilter = document.getElementById('filter-month').value;
+      let recs = getRecords(); if (subFilter) recs = recs.filter(r => r.subject === subFilter); if (monFilter) recs = recs.filter(r => new Date(r.date).getMonth()+1===+monFilter);
+      tbody.innerHTML=''; if (recs.length===0) {tbody.innerHTML='<tr><td colspan="5" class="text-center py-4 text-gray-500">No attendance records</td></tr>'; return;}
+      recs.forEach(r=>{const tr=document.createElement('tr');tr.innerHTML=`<td class="px-4 py-2">${new Date(r.date).toLocaleDateString()}</td><td class="px-4 py-2">${r.subject}</td><td class="px-4 py-2">${r.classHeld?'Yes':'No'}</td><td class="px-4 py-2">${r.classHeld?r.status:'-'}</td><td class="px-4 py-2"><button class="text-red-500 hover:text-red-700" data-id="${r.id}">Delete</button></td>`;tr.querySelector('button').addEventListener('click',()=>deleteRecord(r.id));tbody.appendChild(tr);});
+    }
+    function updateUI(){updateSummary();renderSubjects();renderStats();renderRecords();}
+    function addSubject(e){e.preventDefault();const n=document.getElementById('subject-name').value.trim();if(!n)return alert('Enter a subject name');const subs=getSubjects();if(subs.includes(n))return alert('Subject exists');subs.push(n);saveSubjects(subs);document.getElementById('subject-name').value='';updateUI();}
+    function deleteSubject(n){if(!confirm(`Delete subject ${n}?`))return;saveSubjects(getSubjects().filter(s=>s!==n));saveRecords(getRecords().filter(r=>r.subject!==n));updateUI();}
+    function recordAttendance(e){e.preventDefault();const s=document.getElementById('subject-select').value,ch=document.querySelector('input[name="class-held"]:checked')?.value==='yes',st=document.querySelector('input[name="status"]:checked')?.value;if(!s)return alert('Select subject');if(ch&&!st)return alert('Select status');const recs=getRecords();recs.push({id:Date.now()+'-'+Math.random().toString(36).substr(2,5),date:new Date().toISOString(),subject:s,classHeld:ch,status:ch?st:'N/A'});saveRecords(recs);updateUI();}
+    function deleteRecord(id){if(!confirm('Delete this record?'))return;saveRecords(getRecords().filter(r=>r.id!==id));updateUI();}
+    document.addEventListener('DOMContentLoaded',()=>{document.getElementById('add-subject-form').addEventListener('submit',addSubject);document.getElementById('record-form').addEventListener('submit',recordAttendance);document.getElementById('filter-subject').addEventListener('change',updateUI);document.getElementById('filter-month').addEventListener('change',updateUI);document.getElementById('clear-data').addEventListener('click',()=>{if(confirm('Clear all data?'))localStorage.clear();updateUI();});updateUI();});
+  </script>
+</body>
+</html>

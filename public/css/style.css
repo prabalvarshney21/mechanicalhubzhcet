@@ -1,0 +1,156 @@
+/* Base Styles */
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background-color: #0b1a52;
+  color: #fff;
+}
+
+/* Navbar */
+header {
+  background-color: #000;
+}
+nav {
+  display: flex;
+  align-items: center;
+  max-width: 1200px;
+  margin: auto;
+  padding: 1rem;
+}
+.nav-logo {
+  flex: 1;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #fff;
+}
+.nav-list {
+  list-style: none;
+  display: flex;
+  margin: 0;
+  padding: 0;
+}
+.nav-list li {
+  margin-left: 1rem;
+}
+.nav-list a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 1rem;
+}
+.nav-list a:hover {
+  color: #0061ff;
+}
+
+/* Main Container */
+.main-container,
+.upload-container,
+.contact-container {
+  background-color: #000;
+  padding: 2rem;
+  margin: 2rem auto;
+  border-radius: 8px;
+  max-width: 800px;
+}
+
+/* Section Headings */
+.section-heading {
+  font-size: 2rem;
+  color: #0061ff;
+  margin-bottom: 1rem;
+}
+
+/* Buttons */
+.btn {
+  background-color: #0061ff;
+  color: #fff;
+  padding: 1rem 2rem;
+  margin: 0.5rem;
+  border: none;
+  border-radius: 8px;
+  text-decoration: none;
+  display: inline-block;
+  cursor: pointer;
+}
+.btn:hover {
+  background-color: #0051cc;
+}
+
+/* Footer */
+footer {
+  background-color: #000;
+  color: #fff;
+  text-align: center;
+  padding: 1rem;
+}
+
+/* Login Page */
+.login-page {
+  background-color: #0b1a52;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.login-container {
+  background-color: #000;
+  padding: 2rem;
+  width: 300px;
+  color: #fff;
+  border-radius: 8px;
+}
+.login-container input,
+.login-container button {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: none;
+  border-radius: 4px;
+}
+.login-container button {
+  background-color: #0061ff;
+  cursor: pointer;
+}
+.login-container button:hover {
+  background-color: #0051cc;
+}
+
+/* Contact Page Form */
+.contact-container input,
+.contact-container textarea {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid #333;
+  border-radius: 4px;
+  background-color: #0b1a52;
+  color: #fff;
+}
+.contact-container button {
+  background-color: #0061ff;
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.contact-container button:hover {
+  background-color: #0051cc;
+}
+
+/* Forum-specific Styles */
+.card {
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  border-radius: 0.5rem;
+  background-color: #fff;
+  color: #000;
+}
+
+.card .card-body {
+  background-color: #fff;
+}
+
+img {
+  max-height: 400px;
+  object-fit: contain;
+}

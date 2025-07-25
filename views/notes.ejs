@@ -1,0 +1,38 @@
+<%- include('partials/header') %>
+
+<!-- Page Hero -->
+<% if (typeof year === 'undefined') { %>
+<section class="hero bg-gradient-to-br from-black to-blue-900 text-white py-16 px-4 text-center">
+  <h1 class="text-4xl font-bold mb-4">Notes</h1>
+  <p class="text-lg max-w-3xl mx-auto">Access high-quality lecture notes and summaries for every year and semester.</p>
+</section>
+<% } else { %>
+<section class="hero bg-gradient-to-br from-black to-blue-900 text-white py-16 px-4 text-center">
+  <h1 class="text-4xl font-bold mb-4"><%= year.charAt(0).toUpperCase() + year.slice(1) %> Year Notes</h1>
+  <p class="text-lg max-w-3xl mx-auto">Access high-quality lecture notes and summaries for every year and semester.</p>
+</section>
+<% } %>
+
+<!-- Dynamic Selection -->
+<section class="py-12 px-4 bg-black text-white text-center">
+  <h2 class="text-3xl font-semibold mb-6 text-blue-400">
+    <% if (typeof year === 'undefined') { %>
+      Select Your Year
+    <% } else { %>
+      Select Semester – <%= year.charAt(0).toUpperCase() + year.slice(1) %> Year
+    <% } %>
+  </h2>
+  <div class="flex flex-col sm:flex-row justify-center gap-4">
+    <% if (typeof year === 'undefined') { %>
+      <a href="/notes/2nd" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-lg text-white">2nd Year</a>
+      <a href="/notes/3rd" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-lg text-white">3rd Year</a>
+      <a href="/notes/4th" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-lg text-white">4th Year</a>
+    <% } else { %>
+      <% semesters[year].forEach(sem => { %>
+        <a href="/notes/<%= year %>/<%= sem %>" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-lg text-white"><%= sem.replace(/sem/, 'Sem ') %></a>
+      <% }) %>
+    <% } %>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

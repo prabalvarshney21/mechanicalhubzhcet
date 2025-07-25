@@ -1,0 +1,10 @@
+<%- include('partials/header') %>
+<div class="main-container">
+  <h2><%= year %> Year – <%= sem.toUpperCase() %> PYQs</h2>
+  <div class="btn-grid">
+    <% subjects[sem].forEach(subject => { %>
+      <a href="/pyqs/<%= year %>/<%= sem %>/<%= encodeURIComponent(subject) %>" class="btn"><%= subject %></a>
+    <% }) %>
+  </div>
+</div>
+<%- include('partials/footer') %>
