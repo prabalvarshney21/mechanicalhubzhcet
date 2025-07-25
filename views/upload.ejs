@@ -1,47 +1,53 @@
 <%- include('partials/header') %>
 <div class="main-container py-12 px-4 max-w-xl mx-auto">
-  <h2 class="text-3xl font-semibold mb-6 text-center capitalize"><%= type %> Upload</h2>
+  <h2 class="text-3xl font-semibold mb-6 text-center capitalize">Upload <%= type.toUpperCase() %></h2>
+
+  <!-- Toggle Notes / PYQs -->
+  <div class="flex justify-center space-x-4 mb-6">
+    <a href="/upload?type=notes" class="px-4 py-2 rounded <%= type==='notes' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300' %>">Notes</a>
+    <a href="/upload?type=pyqs"  class="px-4 py-2 rounded <%= type==='pyqs'  ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300' %>">PYQs</a>
+  </div>
+
   <% if (error) { %>
     <div class="bg-red-500 text-white p-4 rounded mb-4"><%= error %></div>
   <% } %>
   <% if (success) { %>
     <div class="bg-green-500 text-white p-4 rounded mb-4"><%= success %></div>
   <% } %>
-  <form action="/upload" method="POST" enctype="multipart/form-data" class="space-y-4">
-    <input type="hidden" name="type" value="<%= type %>">
+
+  <!-- Upload Form -->
+  <form id="uploadForm" action="/upload?type=<%= type %>" method="POST" enctype="multipart/form-data" class="space-y-4">
     <div>
       <label class="block mb-1">Year</label>
-      <select name="year" required class="w-full px-3 py-2 bg-gray-800 text-white rounded">
+      <select name="year" id="yearSelect" class="w-full px-3 py-2 bg-gray-800 text-white rounded" required>
         <option value="">Select Year</option>
         <% years.forEach(y => { %>
-          <option value="<%= y %>" <%= year === y ? 'selected' : '' %>><%= y %> Year</option>
+          <option value="<%= y %>" <%= year===y?'selected':'' %>><%= y %> Year</option>
         <% }) %>
       </select>
     </div>
     <div>
       <label class="block mb-1">Semester</label>
-      <select name="sem" required class="w-full px-3 py-2 bg-gray-800 text-white rounded">
+      <select name="sem" id="semSelect" class="w-full px-3 py-2 bg-gray-800 text-white rounded" required>
         <option value="">Select Semester</option>
-        <% if (year) { semesters[year].forEach(s => { %>
-          <option value="<%= s %>" <%= sem === s ? 'selected' : '' %>><%= s.replace(/sem/, 'Sem ') %></option>
+        <% if (year && semesters[year]) { semesters[year].forEach(s => { %>
+          <option value="<%= s %>" <%= sem===s?'selected':'' %>><%= s.replace('sem','Sem ') %></option>
         <% }) } %>
       </select>
     </div>
-    <% if (type === 'notes' || type === 'pyqs') { %>
     <div>
       <label class="block mb-1">Subject</label>
-      <select name="subject" required class="w-full px-3 py-2 bg-gray-800 text-white rounded">
+      <select name="subject" id="subSelect" class="w-full px-3 py-2 bg-gray-800 text-white rounded" required>
         <option value="">Select Subject</option>
-        <% if (sem) { subjects[sem].forEach(sub => { %>
-          <option value="<%= sub %>" <%= subject === sub ? 'selected' : '' %>><%= sub %></option>
+        <% if (sem && subjects[sem]) { subjects[sem].forEach(sub => { %>
+          <option value="<%= sub %>" <%= subject===sub?'selected':'' %>><%= sub %></option>
         <% }) } %>
       </select>
     </div>
-    <% } %>
-    <% if (type === 'notes') { %>
+    <% if (type==='notes') { %>
     <div>
       <label class="block mb-1">Unit (optional)</label>
-      <input type="number" name="unit" min="1" max="10" value="<%= unit || '' %>" placeholder="e.g. 1" class="w-full px-3 py-2 bg-gray-800 text-white rounded">
+      <input id="unitInput" type="number" name="unit" min="1" max="10" value="<%= unit||'' %>" placeholder="e.g. 1" class="w-full px-3 py-2 bg-gray-800 text-white rounded"/>
     </div>
     <% } %>
     <div>
@@ -52,50 +58,77 @@
       <button type="submit" class="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded">Upload</button>
     </div>
   </form>
+
+  <!-- Show Files Button -->
+  <div class="flex justify-center mt-6">
+    <a id="showFilesBtn" class="px-6 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded" style="display:none;">Show Files</a>
+  </div>
+
+  <!-- Files List -->
+  <% if (filesList && filesList.length) { %>
+  <div class="mt-8">
+    <h3 class="text-xl font-semibold mb-4">Uploaded Files (<%= type.toUpperCase() %>)</h3>
+    <% filesList.forEach(file => { %>
+      <div class="flex justify-between items-center bg-gray-800 text-white px-4 py-2 mb-2 rounded">
+        <a href="/uploads/<%= type %>/<%= year %>/<%= sem %>/<%= subject %><% if(type==='notes'&&unit){ %>/Unit<%= unit %><% } %>/<%= file %>" download class="underline"><%= file %></a>
+        <form action="/upload/delete?type=<%= type %>&year=<%= year %>&sem=<%= sem %>&subject=<%= encodeURIComponent(subject) %><% if(type==='notes'&&unit){ %>&unit=<%= unit %><% } %>" method="POST" style="display:inline;">
+          <input type="hidden" name="file" value="<%= file %>">
+          <button type="submit" class="px-2 py-1 bg-red-600 hover:bg-red-500 text-white rounded">Delete</button>
+        </form>
+      </div>
+    <% }) %>
+  </div>
+  <% } %>
 </div>
 
 <script>
-  // Dynamic cascading selects
   const semestersData = <%- JSON.stringify(semesters) %>;
   const subjectsData = <%- JSON.stringify(subjects) %>;
 
-  const yearSelect = document.querySelector('select[name="year"]');
-  const semSelect = document.querySelector('select[name="sem"]');
-  const subjectSelect = document.querySelector('select[name="subject"]');
+  const yearSelect = document.getElementById('yearSelect');
+  const semSelect = document.getElementById('semSelect');
+  const subSelect = document.getElementById('subSelect');
+  const unitInput = document.getElementById('unitInput');
+  const showBtn = document.getElementById('showFilesBtn');
+
+  function updateShowBtn() {
+    const y = yearSelect.value, s = semSelect.value, sub = subSelect.value;
+    if (y && s && sub) {
+      let url = `/upload?type=<%= type %>&year=${encodeURIComponent(y)}&sem=${encodeURIComponent(s)}&subject=${encodeURIComponent(sub)}`;
+      <% if (type==='notes') { %>
+      const u = unitInput.value; if (u) url += `&unit=${u}`; 
+      <% } %>
+      showBtn.href = url;
+      showBtn.style.display = 'inline-block';
+    } else {
+      showBtn.style.display = 'none';
+    }
+  }
 
   yearSelect.addEventListener('change', () => {
-    const year = yearSelect.value;
-    // Populate semesters
     semSelect.innerHTML = '<option value="">Select Semester</option>';
-    if (semestersData[year]) {
-      semestersData[year].forEach(s => {
-        const opt = document.createElement('option');
-        opt.value = s;
-        opt.textContent = s.replace(/sem/, 'Sem ');
-        semSelect.appendChild(opt);
+    subSelect.innerHTML = '<option value="">Select Subject</option>';
+    if (semestersData[yearSelect.value]) {
+      semestersData[yearSelect.value].forEach(s => {
+        semSelect.appendChild(new Option(s.replace('sem','Sem '), s));
       });
     }
-    // Clear subjects
-    if (subjectSelect) {
-      subjectSelect.innerHTML = '<option value="">Select Subject</option>';
-    }
+    updateShowBtn();
   });
+  semSelect.addEventListener('change', () => {
+    subSelect.innerHTML = '<option value="">Select Subject</option>';
+    if (subjectsData[semSelect.value]) {
+      subjectsData[semSelect.value].forEach(sub => {
+        subSelect.appendChild(new Option(sub, sub));
+      });
+    }
+    updateShowBtn();
+  });
+  subSelect.addEventListener('change', updateShowBtn);
+  if (unitInput) unitInput.addEventListener('input', updateShowBtn);
 
-  if (semSelect) {
-    semSelect.addEventListener('change', () => {
-      const sem = semSelect.value;
-      if (subjectSelect) {
-        subjectSelect.innerHTML = '<option value="">Select Subject</option>';
-        if (subjectsData[sem]) {
-          subjectsData[sem].forEach(sub => {
-            const opt = document.createElement('option');
-            opt.value = sub;
-            opt.textContent = sub;
-            subjectSelect.appendChild(opt);
-          });
-        }
-      }
-    });
-  }
+  // Initialize on load
+  updateShowBtn();
 </script>
+
 <%- include('partials/footer') %>
