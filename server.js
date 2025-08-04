@@ -276,24 +276,16 @@ app.post('/forum/delete/:postId/comment/:idx', (req, res) => {
   res.redirect(`/forum?category=${category}`);
 });
 
-
 // --- Logging Request ---
 app.use((req, res, next) => {
   console.log("Requested URL:", req.url);
   next();
 });
 
-// --- Attendance Page Route ---
-app.get('/attendance', (req, res) => {
-  res.render('attendance');
-});
-
-
 // --- Test Route ---
 app.get('/test', (req, res) => res.send("Test working"));
 
 // --- 404 Handler ---
-
 app.use((req, res) => res.status(404).render('404'));
 
 // --- Start Server ---

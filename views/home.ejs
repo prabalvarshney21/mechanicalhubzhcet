@@ -1,56 +1,56 @@
 <%- include('partials/header') %>
 
-<!-- Hero Section -->
-<div class="hero bg-gradient-to-br from-black to-blue-900 text-white py-16 px-4 text-center">
-  <h1 class="text-4xl font-bold mb-4">Mechanical Hub ZHCET</h1>
-  <p class="text-lg max-w-3xl mx-auto">
-    Empowering ZHCET mechanical engineering students with curated notes, previous year questions, an interactive forum, and an attendance calculator.
-  </p>
+<!-- Hero Section with Stylish Background and Decorative Blobs -->
+<div class="relative bg-gradient-to-br from-black via-blue-950 to-blue-900 text-white pt-20 pb-14 px-4 text-center overflow-hidden">
+  <!-- Decorative blurred blobs for extra depth -->
+  <div class="pointer-events-none absolute top-[-120px] left-[-100px] w-80 h-80 bg-blue-600 opacity-30 rounded-full blur-3xl z-0"></div>
+  <div class="pointer-events-none absolute bottom-[-100px] right-[-80px] w-72 h-72 bg-cyan-300 opacity-20 rounded-full blur-2xl z-0"></div>
+  <!-- Geometric tech background overlay -->
+  <div class="absolute inset-0 z-0 pointer-events-none">
+    <img src="https://www.transparenttextures.com/patterns/hexellence.png" alt="" class="w-full h-full opacity-10 object-cover" />
+  </div>
+  <div class="relative z-10 max-w-3xl mx-auto animate-fadeIn">
+    <h1 class="text-5xl md:text-6xl font-extrabold mb-4 drop-shadow-lg bg-gradient-to-r from-blue-600 via-blue-300 to-cyan-200 bg-clip-text text-transparent tracking-tight">
+      Mechanical Hub ZHCET
+    </h1>
+    <p class="text-lg md:text-xl mb-6 font-medium text-blue-100 shadow bg-black/40 px-4 py-3 rounded-lg inline-block">
+      Empowering <span class="text-blue-300 font-semibold">ZHCET mechanical engineering students</span> with curated notes,<br>
+      previous year questions, and an interactive forum.
+    </p>
+  </div>
 </div>
 
 <!-- Vision Section -->
 <section class="vision bg-black text-white py-12 px-4 text-center">
-  <h2 class="text-3xl font-semibold text-blue-400 mb-4">Our Vision</h2>
-  <p class="max-w-2xl mx-auto">
-    To foster a collaborative learning environment where every mechanical engineering student at ZHCET can access the resources, support, and tools needed to excel academically and professionally.
-  </p>
+  <div class="max-w-2xl mx-auto">
+    <h2 class="text-3xl md:text-4xl font-semibold text-blue-400 mb-4 tracking-tight drop-shadow-lg">Our Vision</h2>
+    <div class="bg-gradient-to-br from-blue-900/80 to-black/80 rounded-xl p-6 shadow-2xl border-l-8 border-blue-500 mx-2">
+      <p class="text-lg md:text-xl text-blue-100 leading-relaxed font-medium">
+        To foster a <span class="text-blue-300 font-semibold">collaborative learning environment</span> where every mechanical engineering student at ZHCET can access the resources, support, and tools needed to excel academically and professionally.
+      </p>
+    </div>
+  </div>
 </section>
 
 <!-- Features Section -->
 <section class="features py-12 px-4 bg-gradient-to-br from-black to-blue-900 text-white">
   <h2 class="text-3xl font-semibold text-center text-blue-400 mb-8">Features</h2>
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-    <div class="bg-gray-800 p-6 rounded-lg text-center">
-      <div class="text-4xl mb-4">📝</div>
-      <h3 class="text-xl font-semibold">Comprehensive Notes</h3>
-      <p class="mt-2">High-quality lecture notes and summaries for all semesters.</p>
-    </div>
-    <div class="bg-gray-800 p-6 rounded-lg text-center">
-      <div class="text-4xl mb-4">📚</div>
-      <h3 class="text-xl font-semibold">Previous Year Questions</h3>
-      <p class="mt-2">Extensive collection of past exam papers for effective preparation.</p>
-    </div>
-    <div class="bg-gray-800 p-6 rounded-lg text-center">
-      <div class="text-4xl mb-4">💬</div>
-      <h3 class="text-xl font-semibold">Interactive Forum</h3>
-      <p class="mt-2">Discuss doubts, collaborate on projects, and share ideas.</p>
-    </div>
-    <div class="bg-gray-800 p-6 rounded-lg text-center">
-      <div class="text-4xl mb-4">📊</div>
-      <h3 class="text-xl font-semibold">Attendance Calculator</h3>
-      <p class="mt-2">Track your attendance and ensure exam eligibility.</p>
-    </div>
-  </div>
-</section>
-
-<!-- Call to Action -->
-<section class="cta py-12 px-4 text-center">
-  <h2 class="text-3xl font-semibold text-white mb-6">Get Started</h2>
-  <div class="flex flex-col sm:flex-row justify-center gap-4">
-    <a href="/notes" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-lg text-white">Explore Notes</a>
-    <a href="/pyqs" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-lg text-white">View PYQs</a>
-    <a href="/forum" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-lg text-white">View Forum</a>
-    <a href="/attendance" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-lg text-white">Use Attendance Calculator</a>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-4xl mx-auto">
+    <a href="/notes" class="bg-gray-800 p-8 rounded-2xl shadow-2xl text-center flex flex-col items-center transition-all duration-200 hover:-translate-y-2 hover:scale-105 hover:shadow-blue-800/40 hover:bg-gradient-to-tr hover:from-blue-950 hover:to-blue-800 cursor-pointer focus:outline-none focus:ring-4 focus:ring-blue-400" style="text-decoration: none;">
+      <div class="text-6xl mb-4 drop-shadow">📝</div>
+      <h3 class="text-2xl font-extrabold mb-2 tracking-tight">Comprehensive Notes</h3>
+      <p class="mt-2 text-base text-blue-200">High-quality lecture notes and summaries for all semesters.</p>
+    </a>
+    <a href="/pyqs" class="bg-gray-800 p-8 rounded-2xl shadow-2xl text-center flex flex-col items-center transition-all duration-200 hover:-translate-y-2 hover:scale-105 hover:shadow-blue-800/40 hover:bg-gradient-to-tr hover:from-blue-950 hover:to-blue-800 cursor-pointer focus:outline-none focus:ring-4 focus:ring-blue-400" style="text-decoration: none;">
+      <div class="text-6xl mb-4 drop-shadow">📚</div>
+      <h3 class="text-2xl font-extrabold mb-2 tracking-tight">Previous Year Questions</h3>
+      <p class="mt-2 text-base text-blue-200">Extensive collection of past exam papers for effective preparation.</p>
+    </a>
+    <a href="/forum" class="bg-gray-800 p-8 rounded-2xl shadow-2xl text-center flex flex-col items-center transition-all duration-200 hover:-translate-y-2 hover:scale-105 hover:shadow-blue-800/40 hover:bg-gradient-to-tr hover:from-blue-950 hover:to-blue-800 cursor-pointer focus:outline-none focus:ring-4 focus:ring-blue-400" style="text-decoration: none;">
+      <div class="text-6xl mb-4 drop-shadow">💬</div>
+      <h3 class="text-2xl font-extrabold mb-2 tracking-tight">Interactive Forum</h3>
+      <p class="mt-2 text-base text-blue-200">Discuss doubts, collaborate on projects, and share ideas.</p>
+    </a>
   </div>
 </section>
 
