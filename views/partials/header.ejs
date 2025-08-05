@@ -18,9 +18,27 @@
 <body class="bg-gradient-to-br from-black to-blue-900 text-white font-sans min-h-screen">
 
   <!-- Announcement Banner -->
-  <div class="bg-blue-900 text-center text-xs text-white py-1 shadow-md z-50">
-    🚀 New Notes for Sem 5 Released • Join the Forum Now!
+    <!-- Auto-Rotating Banner -->
+    <!-- Auto-Rotating Banner -->
+    <!-- Scrolling Banner -->
+  <div class="bg-blue-900 text-white py-1 shadow-md z-50 overflow-hidden whitespace-nowrap">
+    <div id="scrolling-banner" class="inline-block animate-marquee text-xs sm:text-sm font-medium px-4">
+      🚀 New Notes for Sem 5 Released • Join the Forum Now! &nbsp;&nbsp;&nbsp;&nbsp;
+      📚 PYQs Updated for All Semesters! &nbsp;&nbsp;&nbsp;&nbsp;
+      💬 Post Your Doubts in the Forum! &nbsp;&nbsp;&nbsp;&nbsp;
+    </div>
   </div>
+  <style>
+    @keyframes marquee {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+    .animate-marquee {
+      display: inline-block;
+      white-space: nowrap;
+      animation: marquee 18s linear infinite;
+    }
+  </style>
 
   <!-- Navbar -->
   <nav class="navbar-glass sticky top-0 z-40">

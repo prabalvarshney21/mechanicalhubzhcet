@@ -115,7 +115,10 @@ app.post('/contact', (req, res) => {
 });
 
 // --- Admin Dashboard ---
-app.get('/admin', requireAuth, (req, res) => res.render('admin'));
+app.get('/admin', requireAuth, (req, res) => {
+  const bannerText = getBannerText();
+  res.render('admin', { bannerText, session: req.session });
+});
 app.get('/admin/forum', requireAuth, (req, res) => {
   const category = req.query.category || null;
   const posts = category ? forumPosts.filter(p => p.category === category) : forumPosts;
@@ -290,3 +293,14 @@ app.use((req, res) => res.status(404).render('404'));
 
 // --- Start Server ---
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+const bannerFile = path.join(dataDir, 'banner.json');
+function getBannerText() {
+  try {
+    const data = JSON.parse(fs.readFileSync(bannerFile, 'utf8'));
+    return data.text || '';
+  } catch {
+    return '';
+  }
+}
+
+
