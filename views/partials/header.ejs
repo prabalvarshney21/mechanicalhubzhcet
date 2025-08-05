@@ -16,13 +16,21 @@
   </style>
 </head>
 <body class="bg-gradient-to-br from-black to-blue-900 text-white font-sans min-h-screen">
-  <nav class="navbar-glass sticky top-0 z-50">
+
+  <!-- Announcement Banner -->
+  <div class="bg-blue-900 text-center text-xs text-white py-1 shadow-md z-50">
+    🚀 New Notes for Sem 5 Released • Join the Forum Now!
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar-glass sticky top-0 z-40">
     <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
       <a href="/" class="flex items-center gap-3">
         <img src="/logo.png"
              alt="Logo"
              onerror="this.onerror=null;this.src='/favicon.ico';"
              class="h-10 w-10 sm:h-12 sm:w-12 rounded-full shadow-lg border-2 border-blue-700 bg-white object-contain p-1"/>
+        <span class="text-base font-semibold ml-1 sm:hidden">MHZ</span>
       </a>
       <button class="sm:hidden text-white focus:outline-none text-2xl" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
         ☰
@@ -55,5 +63,15 @@
       <% } %>
     </ul>
   </nav>
+
+  <!-- Slogan under navbar -->
+  <div class="text-center text-xs text-gray-300 mt-2 mb-1 sm:hidden">
+    Empowering ZHCET Students
+  </div>
+
+  <!-- Floating Contact Button -->
+  <a href="/contact" class="fixed bottom-4 right-4 bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base px-4 py-2 rounded-full shadow-lg z-50">
+    📩 Contact
+  </a>
 
   <main class="min-h-screen py-6 px-4 sm:px-8 max-w-6xl mx-auto">
