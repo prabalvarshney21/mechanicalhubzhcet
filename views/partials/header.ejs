@@ -17,18 +17,22 @@
 </head>
 <body class="bg-gradient-to-br from-black to-blue-900 text-white font-sans min-h-screen">
   <nav class="navbar-glass sticky top-0 z-50">
-    <div class="max-w-6xl mx-auto px-8 py-3 flex justify-between items-center">
-      <a href="/" class="flex items-center gap-4">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+      <a href="/" class="flex items-center gap-3">
         <img src="/logo.png"
              alt="Logo"
              onerror="this.onerror=null;this.src='/favicon.ico';"
-             class="h-14 w-14 rounded-2xl shadow-lg border-2 border-blue-700 bg-white object-contain p-2"/>
+             class="h-12 w-12 sm:h-14 sm:w-14 rounded-2xl shadow-lg border-2 border-blue-700 bg-white object-contain p-2"/>
+        <span class="text-xl sm:text-2xl font-bold hidden sm:inline">MechanicalHubZhcet</span>
       </a>
-      <ul class="flex space-x-8 font-semibold text-lg items-center">
-        <li><a href="/notes" class="hover:text-blue-400 transition-all duration-150">Notes</a></li>
-        <li><a href="/pyqs" class="hover:text-blue-400 transition-all duration-150">PYQs</a></li>
-        <li><a href="/forum" class="hover:text-blue-400 transition-all duration-150">Forum</a></li>
-        <li><a href="/contact" class="hover:text-blue-400 transition-all">Contact Us</a></li>
+      <button class="sm:hidden text-white focus:outline-none" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+        ☰
+      </button>
+      <ul class="hidden sm:flex space-x-4 md:space-x-8 font-semibold text-sm md:text-base items-center">
+        <li><a href="/notes" class="hover:text-blue-400 transition-all">Notes</a></li>
+        <li><a href="/pyqs" class="hover:text-blue-400 transition-all">PYQs</a></li>
+        <li><a href="/forum" class="hover:text-blue-400 transition-all">Forum</a></li>
+        <li><a href="/contact" class="hover:text-blue-400 transition-all">Contact</a></li>
         <% if (!session.admin) { %>
           <li><a href="/login" class="hover:text-blue-400 transition-all">Login</a></li>
         <% } else { %>
@@ -37,5 +41,20 @@
         <% } %>
       </ul>
     </div>
+
+    <!-- Mobile Menu -->
+    <ul id="mobile-menu" class="sm:hidden px-6 pb-4 space-y-2 font-medium text-base hidden">
+      <li><a href="/notes" class="block hover:text-blue-400">Notes</a></li>
+      <li><a href="/pyqs" class="block hover:text-blue-400">PYQs</a></li>
+      <li><a href="/forum" class="block hover:text-blue-400">Forum</a></li>
+      <li><a href="/contact" class="block hover:text-blue-400">Contact</a></li>
+      <% if (!session.admin) { %>
+        <li><a href="/login" class="block hover:text-blue-400">Login</a></li>
+      <% } else { %>
+        <li><a href="/admin" class="block hover:text-blue-400">Admin</a></li>
+        <li><a href="/logout" class="block hover:text-blue-400">Logout</a></li>
+      <% } %>
+    </ul>
   </nav>
-  <main class="min-h-screen py-8 px-4 max-w-6xl mx-auto">
+
+  <main class="min-h-screen py-6 px-4 sm:px-8 max-w-6xl mx-auto">
