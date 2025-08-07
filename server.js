@@ -16,6 +16,13 @@ if (!fs.existsSync(forumDataPath)) {
   fs.writeFileSync(forumDataPath, JSON.stringify({ posts: [], nextId: 1 }, null, 2));
 }
 
+// **--- (FIX) Banner Data Setup ---**
+const bannerFile = path.join(dataDir, 'banner.json');
+const defaultBannerText = '🚀 New Notes for Sem 5 Released • Join the Forum Now! &nbsp;&nbsp;&nbsp;&nbsp; 📚 PYQs Updated for All Semesters! &nbsp;&nbsp;&nbsp;&nbsp; 💬 Post Your Doubts in the Forum! &nbsp;&nbsp;&nbsp;&nbsp;';
+if (!fs.existsSync(bannerFile)) {
+    fs.writeFileSync(bannerFile, JSON.stringify({ text: defaultBannerText }, null, 2));
+}
+
 function loadForumData() {
   try {
     return JSON.parse(fs.readFileSync(forumDataPath, 'utf8'));
@@ -26,6 +33,16 @@ function loadForumData() {
 
 function saveForumData(data) {
   fs.writeFileSync(forumDataPath, JSON.stringify(data, null, 2));
+}
+
+// **--- (FIX) Function to get banner text ---**
+function getBannerText() {
+  try {
+    const data = JSON.parse(fs.readFileSync(bannerFile, 'utf8'));
+    return data.text || defaultBannerText;
+  } catch {
+    return defaultBannerText;
+  }
 }
 
 let { posts: forumPosts, nextId: nextForumId } = loadForumData();
@@ -88,7 +105,13 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ extended: true, limit: '100mb' }));
 app.use(session({ secret: 'secret', resave: false, saveUninitialized: false }));
-app.use((req, res, next) => { res.locals.session = req.session; next(); });
+
+// **--- (FIX) Middleware to pass session and banner text to all templates ---**
+app.use((req, res, next) => {
+    res.locals.session = req.session;
+    res.locals.bannerText = getBannerText();
+    next();
+});
 
 // --- Auth Middleware ---
 function requireAuth(req, res, next) {
@@ -116,9 +139,20 @@ app.post('/contact', (req, res) => {
 
 // --- Admin Dashboard ---
 app.get('/admin', requireAuth, (req, res) => {
-  const bannerText = getBannerText();
-  res.render('admin', { bannerText, session: req.session });
+  res.render('admin');
 });
+
+// **--- (FIX) Add route to handle banner update ---**
+app.post('/admin/banner', requireAuth, (req, res) => {
+    const { bannerText } = req.body;
+    try {
+        fs.writeFileSync(bannerFile, JSON.stringify({ text: bannerText }, null, 2));
+    } catch (error) {
+        console.error("Failed to update banner:", error);
+    }
+    res.redirect('/admin');
+});
+
 app.get('/admin/forum', requireAuth, (req, res) => {
   const category = req.query.category || null;
   const posts = category ? forumPosts.filter(p => p.category === category) : forumPosts;
@@ -185,7 +219,7 @@ app.post('/upload/delete', requireAuth, (req, res) => {
   res.redirect('/upload?' + params.toString());
 });
 
-// --- Notes Browsing ---
+// --- Notes Browse ---
 app.get('/notes', (req, res) => res.render('notes',{ years, semesters }));
 app.get('/notes/:year', (req, res) => {
   const { year } = req.params;
@@ -211,7 +245,7 @@ app.get('/notes/:year/:sem/:subject', (req, res) => {
   res.render('notes_subject', { year, sem, subject, years, semesters });
 });
 
-// --- PYQs Browsing ---
+// --- PYQs Browse ---
 app.get('/pyqs', (req, res) => res.render('pyqs',{ years, semesters, subjects }));
 app.get('/pyqs/:year', (req, res) => {
   const { year } = req.params;
@@ -293,14 +327,3 @@ app.use((req, res) => res.status(404).render('404'));
 
 // --- Start Server ---
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
-const bannerFile = path.join(dataDir, 'banner.json');
-function getBannerText() {
-  try {
-    const data = JSON.parse(fs.readFileSync(bannerFile, 'utf8'));
-    return data.text || '';
-  } catch {
-    return '';
-  }
-}
-
-

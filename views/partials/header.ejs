@@ -17,15 +17,9 @@
 </head>
 <body class="bg-gradient-to-br from-black to-blue-900 text-white font-sans min-h-screen">
 
-  <!-- Announcement Banner -->
-    <!-- Auto-Rotating Banner -->
-    <!-- Auto-Rotating Banner -->
-    <!-- Scrolling Banner -->
   <div class="bg-blue-900 text-white py-1 shadow-md z-50 overflow-hidden whitespace-nowrap">
     <div id="scrolling-banner" class="inline-block animate-marquee text-xs sm:text-sm font-medium px-4">
-      🚀 New Notes for Sem 5 Released • Join the Forum Now! &nbsp;&nbsp;&nbsp;&nbsp;
-      📚 PYQs Updated for All Semesters! &nbsp;&nbsp;&nbsp;&nbsp;
-      💬 Post Your Doubts in the Forum! &nbsp;&nbsp;&nbsp;&nbsp;
+      <%- bannerText %>
     </div>
   </div>
   <style>
@@ -40,7 +34,6 @@
     }
   </style>
 
-  <!-- Navbar -->
   <nav class="navbar-glass sticky top-0 z-40">
     <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
       <a href="/" class="flex items-center gap-3">
@@ -67,7 +60,6 @@
       </ul>
     </div>
 
-    <!-- Mobile Menu -->
     <ul id="mobile-menu" class="sm:hidden px-6 pb-4 space-y-2 font-medium text-base hidden">
       <li><a href="/notes" class="block hover:text-blue-400">Notes</a></li>
       <li><a href="/pyqs" class="block hover:text-blue-400">PYQs</a></li>
@@ -82,12 +74,10 @@
     </ul>
   </nav>
 
-  <!-- Slogan under navbar -->
   <div class="text-center text-xs text-gray-300 mt-2 mb-1 sm:hidden">
     Empowering ZHCET Students
   </div>
 
-  <!-- Floating Contact Button -->
   <a href="/contact" class="fixed bottom-4 right-4 bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base px-4 py-2 rounded-full shadow-lg z-50">
     📩 Contact
   </a>
