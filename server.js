@@ -16,7 +16,6 @@ if (!fs.existsSync(forumDataPath)) {
   fs.writeFileSync(forumDataPath, JSON.stringify({ posts: [], nextId: 1 }, null, 2));
 }
 
-// **--- (FIX) Banner Data Setup ---**
 const bannerFile = path.join(dataDir, 'banner.json');
 const defaultBannerText = '🚀 New Notes for Sem 5 Released • Join the Forum Now! &nbsp;&nbsp;&nbsp;&nbsp; 📚 PYQs Updated for All Semesters! &nbsp;&nbsp;&nbsp;&nbsp; 💬 Post Your Doubts in the Forum! &nbsp;&nbsp;&nbsp;&nbsp;';
 if (!fs.existsSync(bannerFile)) {
@@ -35,7 +34,6 @@ function saveForumData(data) {
   fs.writeFileSync(forumDataPath, JSON.stringify(data, null, 2));
 }
 
-// **--- (FIX) Function to get banner text ---**
 function getBannerText() {
   try {
     const data = JSON.parse(fs.readFileSync(bannerFile, 'utf8'));
@@ -87,6 +85,24 @@ const pyqsStorage = multer.diskStorage({
 });
 const uploadPyqs = multer({ storage: pyqsStorage });
 
+// **--- NEW: Multer storage for Syllabus ---**
+const syllabusStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const { year, sem } = req.body;
+    const dir = path.join(__dirname, 'uploads', 'syllabus', year, sem);
+    fs.mkdirSync(dir, { recursive: true });
+    cb(null, dir);
+  },
+  filename: (req, file, cb) => {
+    // Save syllabus with the subject name as the filename
+    const subject = req.body.subject;
+    const extension = path.extname(file.originalname);
+    cb(null, subject + extension);
+  },
+});
+const uploadSyllabus = multer({ storage: syllabusStorage });
+
+
 const forumStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     const dir = path.join(__dirname, 'uploads', 'forum');
@@ -106,7 +122,6 @@ app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ extended: true, limit: '100mb' }));
 app.use(session({ secret: 'secret', resave: false, saveUninitialized: false }));
 
-// **--- (FIX) Middleware to pass session and banner text to all templates ---**
 app.use((req, res, next) => {
     res.locals.session = req.session;
     res.locals.bannerText = getBannerText();
@@ -142,7 +157,6 @@ app.get('/admin', requireAuth, (req, res) => {
   res.render('admin');
 });
 
-// **--- (FIX) Add route to handle banner update ---**
 app.post('/admin/banner', requireAuth, (req, res) => {
     const { bannerText } = req.body;
     try {
@@ -162,32 +176,50 @@ app.get('/admin/forum', requireAuth, (req, res) => {
 // --- Upload Routes ---
 app.get('/upload', requireAuth, (req, res) => {
   let { type = 'notes', year, sem, subject, unit, success, error } = req.query;
-  if (!['notes','pyqs'].includes(type)) type = 'notes';
+  // **--- UPDATED: Add 'syllabus' to allowed types ---**
+  if (!['notes', 'pyqs', 'syllabus'].includes(type)) type = 'notes';
+  
   let filesList = [];
   if (year && sem && subject) {
     const decodedSubject = decodeURIComponent(subject);
-    const base = path.join(__dirname, 'uploads', type, year, sem, decodedSubject);
-    const dir = (type==='notes' && unit) ? path.join(base, 'Unit' + unit) : base;
-    if (fs.existsSync(dir)) filesList = fs.readdirSync(dir);
+    let dir;
+    // **--- UPDATED: Logic to find syllabus files ---**
+    if (type === 'syllabus') {
+        dir = path.join(__dirname, 'uploads', 'syllabus', year, sem);
+        if (fs.existsSync(dir)) {
+            // Filter to show only the syllabus for the selected subject
+            const allSyllabi = fs.readdirSync(dir);
+            const targetFile = allSyllabi.find(f => f.startsWith(decodedSubject));
+            if(targetFile) filesList.push(targetFile);
+        }
+    } else {
+        const base = path.join(__dirname, 'uploads', type, year, sem, decodedSubject);
+        dir = (type === 'notes' && unit) ? path.join(base, 'Unit' + unit) : base;
+        if (fs.existsSync(dir)) filesList = fs.readdirSync(dir);
+    }
   }
   res.render('upload', {
-    type,
-    year,
-    sem,
+    type, year, sem,
     subject: subject ? decodeURIComponent(subject) : '',
-    unit,
-    years,
-    semesters,
-    subjects,
-    success,
-    error,
-    filesList
+    unit, years, semesters, subjects,
+    success, error, filesList
   });
 });
+
 app.post('/upload', requireAuth, (req, res) => {
-  const type = (req.query.type === 'pyqs') ? 'pyqs' : 'notes';
+  const { type = 'notes' } = req.query;
   const { year, sem, subject, unit } = req.body;
-  const handler = (type==='pyqs') ? uploadPyqs.array('files') : uploadNotes.array('files');
+
+  let handler;
+  // **--- UPDATED: Route to the correct multer handler ---**
+  if (type === 'pyqs') {
+    handler = uploadPyqs.array('files');
+  } else if (type === 'syllabus') {
+    handler = uploadSyllabus.single('file'); // Syllabus expects a single file
+  } else {
+    handler = uploadNotes.array('files');
+  }
+
   handler(req, res, err => {
     if (err) {
       return res.render('upload', {
@@ -196,28 +228,42 @@ app.post('/upload', requireAuth, (req, res) => {
         success: null, error: err.message, filesList: []
       });
     }
-    const msg = (type==='pyqs') ? 'PYQs uploaded successfully' : 'Notes uploaded successfully';
+    const msg = `${type.charAt(0).toUpperCase() + type.slice(1)} uploaded successfully`;
     const params = new URLSearchParams({ type, year, sem, subject, unit, success: msg });
     res.redirect('/upload?' + params.toString());
   });
 });
+
 app.post('/upload/delete', requireAuth, (req, res) => {
-  const type = (req.query.type === 'pyqs') ? 'pyqs' : 'notes';
-  const year = req.query.year;
-  const sem = req.query.sem;
-  const subject = req.query.subject ? decodeURIComponent(req.query.subject) : '';
-  const unit = req.query.unit;
-  const file = req.body.file;
+  const { type = 'notes' } = req.query;
+  const { year, sem, subject: encodedSubject, unit } = req.query;
+  const { file } = req.body;
+  const subject = decodeURIComponent(encodedSubject);
+
   if (!year || !sem || !subject || !file) {
-    return res.redirect(`/upload?type=${type}`);
+    return res.status(400).send('Missing required parameters for deletion.');
   }
-  let dir = path.join(__dirname, 'uploads', type, year, sem, subject);
-  if (type==='notes' && unit) dir = path.join(dir, 'Unit' + unit);
-  const filePath = path.join(dir, file);
-  if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+
+  let filePath;
+  // **--- UPDATED: Logic to delete syllabus files ---**
+  if (type === 'syllabus') {
+    filePath = path.join(__dirname, 'uploads', 'syllabus', year, sem, file);
+  } else {
+    let dir = path.join(__dirname, 'uploads', type, year, sem, subject);
+    if (type === 'notes' && unit) {
+      dir = path.join(dir, 'Unit' + unit);
+    }
+    filePath = path.join(dir, file);
+  }
+  
+  if (fs.existsSync(filePath)) {
+    fs.unlinkSync(filePath);
+  }
+  
   const params = new URLSearchParams({ type, year, sem, subject, unit, success: 'File deleted successfully' });
   res.redirect('/upload?' + params.toString());
 });
+
 
 // --- Notes Browse ---
 app.get('/notes', (req, res) => res.render('notes',{ years, semesters }));

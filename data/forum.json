@@ -1,6 +1,15 @@
 {
   "posts": [
     {
+      "_id": 11,
+      "username": "Anonymous",
+      "text": "yo",
+      "category": "4thyear",
+      "files": [],
+      "createdAt": "2025-08-05T16:40:39.137Z",
+      "comments": []
+    },
+    {
       "_id": 6,
       "username": "",
       "text": "boss",
@@ -9,5 +18,5 @@
       "comments": []
     }
   ],
-  "nextId": 11
+  "nextId": 12
 }

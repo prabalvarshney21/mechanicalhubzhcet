@@ -1,21 +1,51 @@
 <%- include('partials/header') %>
 
-<!-- Page Hero for Semester -->
+<%
+  // Helper function to assign an icon based on the subject name
+  function getIconForSubject(subjectName) {
+    const s = subjectName.toLowerCase();
+    const iconMap = {
+      'math': '📈',
+      'mechanics': '⚙️', 'solid': '⚙️', 'kinematics': '⚙️', 'dynamics': '⚙️', 'vibration': '⚙️',
+      'fluid': '💧',
+      'thermo': '🔥', 'heat': '🔥', 'energy': '🔥',
+      'design': '📐',
+      'drawing': '📏',
+      'material': '💎',
+      'manufacturing': '🏭',
+      'electrical': '⚡️',
+      'lab': '🧪',
+      'project': '🏗️', 'training': '🏗️', 'internship': '🏗️',
+      'industrial': '📊', 'management': '📊', 'economy': '📊',
+      'numerical': '🧮',
+      'colloquium': '🗣️',
+    };
+    for (const key in iconMap) {
+      if (s.includes(key)) return iconMap[key];
+    }
+    return '📖'; // Default icon for electives or others
+  }
+%>
+
 <section class="hero bg-gradient-to-br from-black to-blue-900 text-white py-16 px-4 text-center">
-  <h1 class="text-4xl font-bold mb-4"><%= year %> Year — <%= sem.replace(/sem/, 'Sem ') %> Subjects</h1>
-  <p class="text-lg max-w-3xl mx-auto">Browse lecture notes for <%= year %> <%= sem.replace(/sem/, 'Sem ') %>.</p>
+  <h1 class="text-4xl lg:text-5xl font-bold mb-4"><%= year.charAt(0).toUpperCase() + year.slice(1) %> Year — <%= sem.replace('sem', 'Semester ') %></h1>
+  <p class="text-lg lg:text-xl max-w-3xl mx-auto">Select a subject to view its notes.</p>
 </section>
 
-<!-- Subject Selection -->
-<section class="bg-black py-12 px-4">
-  <h2 class="text-3xl font-semibold text-center text-blue-500 mb-6">Select Subject — <%= sem.replace(/sem/, 'Sem ') %></h2>
-  <div class="flex flex-wrap justify-center gap-4">
+<section class="bg-black py-16 px-4">
+  <h2 class="text-3xl font-semibold text-center text-blue-400 mb-12">Select Subject</h2>
+  <div class="max-w-7xl mx-auto flex flex-wrap justify-center gap-6">
     <% subjects[sem].forEach(sub => { %>
       <a 
         href="/notes/<%= year %>/<%= sem %>/<%= encodeURIComponent(sub) %>" 
-        class="px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-lg text-white"
+        class="group block w-full sm:w-64 text-center bg-gray-900/50 p-6 rounded-xl border-2 border-blue-900 hover:border-blue-500 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-blue-600/20"
       >
-        <%= sub %>
+        <div class="text-5xl mb-4 transition-transform duration-300 group-hover:scale-110">
+          <%= getIconForSubject(sub) %>
+        </div>
+        <h3 class="text-lg font-semibold text-white leading-snug">
+          <%= sub %>
+        </h3>
       </a>
     <% }) %>
   </div>

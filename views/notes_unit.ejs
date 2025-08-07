@@ -1,27 +1,72 @@
 <%- include('partials/header') %>
 
+<%
+  // Helper function to get an icon based on file extension
+  function getFileIcon(filename) {
+    const ext = filename.split('.').pop().toLowerCase();
+    const iconMap = {
+      'pdf': '📄',
+      'doc': '📝', 'docx': '📝',
+      'ppt': '🖥️', 'pptx': '🖥️',
+      'xls': '📊', 'xlsx': '📊',
+      'png': '🖼️', 'jpg': '🖼️', 'jpeg': '🖼️', 'gif': '🖼️',
+      'zip': '📦', 'rar': '📦',
+    };
+    return iconMap[ext] || '📁'; // Default file icon
+  }
+
+  // Helper function to clean up the filename for display
+  function getCleanFilename(filename) {
+    // Removes the extension from the filename
+    return filename.substring(0, filename.lastIndexOf('.')) || filename;
+  }
+%>
+
 <section class="hero bg-gradient-to-br from-black to-blue-900 text-white py-16 px-4 text-center">
-  <h1 class="text-4xl font-bold mb-4"><%= subject %> — Unit <%= unit %> Files</h1>
-  <p class="text-lg max-w-3xl mx-auto">Download available notes for Unit <%= unit %>.</p>
+  <h1 class="text-4xl lg:text-5xl font-bold mb-4"><%= subject %> — Unit <%= unit %></h1>
+  <p class="text-lg lg:text-xl max-w-3xl mx-auto">Preview or download the available notes below.</p>
 </section>
 
-<section class="bg-black text-white py-12 px-4">
-  <h2 class="text-3xl font-semibold text-center text-blue-500 mb-6">Files</h2>
+<section class="bg-black text-white py-16 px-4">
+  <h2 class="text-3xl font-semibold text-center text-blue-400 mb-12">Available Files</h2>
+  
   <% if (files.length) { %>
-    <ul class="list-disc list-inside space-y-2 max-w-2xl mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
       <% files.forEach(file => { %>
-        <li>
-          <a href="/uploads/notes/<%= year %>/<%= sem %>/<%= encodeURIComponent(subject) %>/Unit<%= unit %>/<%= file %>"
-             class="text-blue-400 hover:underline" download><%= file %></a>
-        </li>
+        <% const fileUrl = `/uploads/notes/${year}/${sem}/${encodeURIComponent(subject)}/Unit${unit}/${file}`; %>
+        
+        <div class="bg-gray-900/50 border-2 border-blue-900 rounded-xl p-6 flex flex-col">
+          <div class="flex items-start gap-4">
+            <div class="text-4xl text-blue-300">
+              <%= getFileIcon(file) %>
+            </div>
+            <h3 class="text-lg font-semibold text-white flex-1">
+              <%= getCleanFilename(file) %>
+            </h3>
+          </div>
+          <div class="flex-grow"></div> <div class="flex items-center gap-3 mt-6">
+            <a href="<%= fileUrl %>" target="_blank"
+               class="flex-1 text-center px-4 py-2 bg-transparent border-2 border-blue-600 rounded-lg hover:bg-blue-600 transition-all duration-300">
+              Preview
+            </a>
+            <a href="<%= fileUrl %>" download
+               class="flex-1 text-center px-4 py-2 bg-blue-600 border-2 border-blue-600 rounded-lg hover:bg-blue-500 hover:border-blue-500 transition-all duration-300">
+              Download
+            </a>
+          </div>
+        </div>
+
       <% }) %>
-    </ul>
+    </div>
   <% } else { %>
-    <p class="text-center text-gray-400">No files uploaded for this unit yet.</p>
+    <p class="text-center text-gray-400">No files have been uploaded for this unit yet.</p>
   <% } %>
-  <div class="mt-8 text-center">
+
+  <div class="mt-12 text-center">
     <a href="/notes/<%= year %>/<%= sem %>/<%= encodeURIComponent(subject) %>"
-       class="px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-lg text-white">Back to Units</a>
+       class="px-8 py-3 bg-blue-800 hover:bg-blue-700 rounded-lg text-white font-semibold transition-all duration-300">
+       ← Back to Units
+    </a>
   </div>
 </section>
 

@@ -2,10 +2,10 @@
 <div class="main-container py-12 px-4 max-w-xl mx-auto">
   <h2 class="text-3xl font-semibold mb-6 text-center capitalize">Upload <%= type.toUpperCase() %></h2>
 
-  <!-- Toggle Notes / PYQs -->
   <div class="flex justify-center space-x-4 mb-6">
     <a href="/upload?type=notes" class="px-4 py-2 rounded <%= type==='notes' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300' %>">Notes</a>
     <a href="/upload?type=pyqs"  class="px-4 py-2 rounded <%= type==='pyqs'  ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300' %>">PYQs</a>
+    <a href="/upload?type=syllabus" class="px-4 py-2 rounded <%= type==='syllabus' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300' %>">Syllabus</a>
   </div>
 
   <% if (error) { %>
@@ -15,7 +15,6 @@
     <div class="bg-green-500 text-white p-4 rounded mb-4"><%= success %></div>
   <% } %>
 
-  <!-- Upload Form -->
   <form id="uploadForm" action="/upload?type=<%= type %>" method="POST" enctype="multipart/form-data" class="space-y-4">
     <div>
       <label class="block mb-1">Year</label>
@@ -44,33 +43,48 @@
         <% }) } %>
       </select>
     </div>
-    <% if (type==='notes') { %>
+    
+    <% if (type === 'notes') { %>
     <div>
       <label class="block mb-1">Unit (optional)</label>
       <input id="unitInput" type="number" name="unit" min="1" max="10" value="<%= unit||'' %>" placeholder="e.g. 1" class="w-full px-3 py-2 bg-gray-800 text-white rounded"/>
     </div>
     <% } %>
+
     <div>
-      <label class="block mb-1">Files</label>
-      <input type="file" name="files" multiple required class="w-full text-white">
+      <% if (type === 'syllabus') { %>
+        <label class="block mb-1">Syllabus File (PDF, etc.)</label>
+        <input type="file" name="file" required class="w-full text-white">
+      <% } else { %>
+        <label class="block mb-1">Files</label>
+        <input type="file" name="files" multiple required class="w-full text-white">
+      <% } %>
     </div>
     <div class="text-center">
       <button type="submit" class="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded">Upload</button>
     </div>
   </form>
 
-  <!-- Show Files Button -->
   <div class="flex justify-center mt-6">
     <a id="showFilesBtn" class="px-6 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded" style="display:none;">Show Files</a>
   </div>
 
-  <!-- Files List -->
   <% if (filesList && filesList.length) { %>
   <div class="mt-8">
     <h3 class="text-xl font-semibold mb-4">Uploaded Files (<%= type.toUpperCase() %>)</h3>
     <% filesList.forEach(file => { %>
       <div class="flex justify-between items-center bg-gray-800 text-white px-4 py-2 mb-2 rounded">
-        <a href="/uploads/<%= type %>/<%= year %>/<%= sem %>/<%= subject %><% if(type==='notes'&&unit){ %>/Unit<%= unit %><% } %>/<%= file %>" download class="underline"><%= file %></a>
+        <% 
+          let filePath = `/uploads/${type}/${year}/${sem}/`;
+          if (type !== 'syllabus') {
+            filePath += `${encodeURIComponent(subject)}`;
+            if(type === 'notes' && unit) {
+              filePath += `/Unit${unit}`;
+            }
+          }
+          filePath += `/${file}`;
+        %>
+        <a href="<%= filePath %>" download class="underline"><%= file %></a>
         <form action="/upload/delete?type=<%= type %>&year=<%= year %>&sem=<%= sem %>&subject=<%= encodeURIComponent(subject) %><% if(type==='notes'&&unit){ %>&unit=<%= unit %><% } %>" method="POST" style="display:inline;">
           <input type="hidden" name="file" value="<%= file %>">
           <button type="submit" class="px-2 py-1 bg-red-600 hover:bg-red-500 text-white rounded">Delete</button>
@@ -95,9 +109,9 @@
     const y = yearSelect.value, s = semSelect.value, sub = subSelect.value;
     if (y && s && sub) {
       let url = `/upload?type=<%= type %>&year=${encodeURIComponent(y)}&sem=${encodeURIComponent(s)}&subject=${encodeURIComponent(sub)}`;
-      <% if (type==='notes') { %>
-      const u = unitInput.value; if (u) url += `&unit=${u}`; 
-      <% } %>
+      if (unitInput && unitInput.value) { // Check if unitInput exists
+          url += `&unit=${unitInput.value}`;
+      }
       showBtn.href = url;
       showBtn.style.display = 'inline-block';
     } else {
@@ -115,6 +129,7 @@
     }
     updateShowBtn();
   });
+
   semSelect.addEventListener('change', () => {
     subSelect.innerHTML = '<option value="">Select Subject</option>';
     if (subjectsData[semSelect.value]) {
@@ -124,6 +139,7 @@
     }
     updateShowBtn();
   });
+
   subSelect.addEventListener('change', updateShowBtn);
   if (unitInput) unitInput.addEventListener('input', updateShowBtn);
 

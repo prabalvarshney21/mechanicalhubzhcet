@@ -1,40 +1,36 @@
 <%- include('partials/header') %>
-<% // Determine the active category %>
+
 <% const currentCategory = (typeof category !== 'undefined' && category) ? category : null; %>
 
 <main class="main-container max-w-4xl mx-auto py-8 space-y-10">
-
   <% if (!currentCategory) { %>
-    <!-- Hero Section -->
-    <section class="hero bg-gradient-to-br from-black to-blue-900 text-white py-16 px-4 text-center">
-      <h1 class="text-4xl font-bold mb-4">Welcome to the Discussion Forum</h1>
-      <p class="text-lg max-w-3xl mx-auto">Choose your category and join the conversation in our community-driven forum.</p>
+    <section class="hero bg-gradient-to-br from-black to-blue-900 text-white py-16 px-4 text-center rounded-lg">
+      <h1 class="text-4xl lg:text-5xl font-bold mb-4">Discussion Forum</h1>
+      <p class="text-lg lg:text-xl max-w-3xl mx-auto">Choose a category and join the conversation.</p>
     </section>
 
-    <!-- Category Selection -->
-    <section class="py-12 px-4 bg-black text-white text-center">
-      <h2 class="text-3xl font-semibold mb-6 text-blue-400">Select Your Category</h2>
-      <div class="flex flex-col sm:flex-row justify-center gap-4">
+    <section class="py-16 px-4 bg-black text-white text-center">
+      <h2 class="text-3xl font-semibold mb-12 text-blue-400">Select a Category</h2>
+      <div class="flex flex-wrap justify-center gap-8">
         <% const categories = [
-             { key: '2ndyear', label: '2nd Year' },
-             { key: '3rdyear', label: '3rd Year' },
-             { key: '4thyear', label: '4th Year' },
-             { key: 'gate2026', label: 'GATE 2026' },
-             { key: 'gate2027', label: 'GATE 2027' }
-           ];
-        %>
+             { key: '2ndyear', label: '2nd Year', icon: '🎓' },
+             { key: '3rdyear', label: '3rd Year', icon: '🎓' },
+             { key: '4thyear', label: '4th Year', icon: '🎓' },
+             { key: 'gate2026', label: 'GATE 2026', icon: '🎯' },
+             { key: 'gate2027', label: 'GATE 2027', icon: '🎯' }
+           ]; %>
         <% categories.forEach(cat => { %>
           <a href="/forum?category=<%= cat.key %>"
-             class="inline-block px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-lg text-white transition cursor-pointer" 
-             >
-            <%= cat.label %>
+             class="group block w-full sm:w-56 bg-gray-900/50 p-8 rounded-xl border-2 border-blue-900 hover:border-blue-500 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-blue-600/20">
+            <div class="text-5xl mb-4 transition-transform duration-300 group-hover:scale-110"><%= cat.icon %></div>
+            <h3 class="text-2xl font-bold text-white"><%= cat.label %></h3>
           </a>
         <% }); %>
       </div>
     </section>
+
   <% } else { %>
-    <!-- Selected Category Header -->
-    <section class="text-center py-8 bg-black text-white rounded-lg">
+    <section class="text-center pt-8 bg-black text-white rounded-lg">
       <h2 class="text-3xl font-bold text-blue-200">
         <% const mapping = {
              '2ndyear': '2nd Year',
@@ -42,13 +38,11 @@
              '4thyear': '4th Year',
              'gate2026': 'GATE 2026',
              'gate2027': 'GATE 2027'
-           };
-        %>
+           }; %>
         <%= mapping[currentCategory] || currentCategory %> Discussions
       </h2>
     </section>
 
-    <!-- Post Form -->
     <form method="POST" action="/forum/post" enctype="multipart/form-data" class="space-y-4 bg-black p-6 rounded-lg">
       <input type="hidden" name="category" value="<%= currentCategory %>" />
       <textarea name="text" rows="3" placeholder="Ask a question..."
@@ -56,15 +50,14 @@
       <div class="flex flex-wrap items-center gap-4">
         <input type="text" name="username" placeholder="Your Name"
                class="px-4 py-2 rounded-lg bg-zinc-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/>
-        <input type="file" name="files" multiple class="text-white" />
+        <input type="file" name="files" multiple class="text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-900 file:text-blue-200 hover:file:bg-blue-800"/>
         <button type="submit"
-                class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-500 transition cursor-pointer">
-          Post Question
+                class="ml-auto bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-500 transition cursor-pointer">
+          Post
         </button>
       </div>
     </form>
 
-    <!-- Posts List -->
     <% posts.forEach(post => { %>
       <div class="bg-zinc-900 p-6 rounded-lg shadow mb-6 text-left text-white space-y-3">
         <div class="flex items-center gap-3 mb-1">
@@ -76,12 +69,12 @@
             <div class="text-xs text-gray-400"><%= new Date(post.createdAt).toLocaleString() %></div>
           </div>
           <% if (session.admin) { %>
-    <form method="POST" action="/forum/delete/<%= post._id %>?category=<%= currentCategory %>" class="ml-auto">
-            <button class="text-red-400 text-xs hover:underline cursor-pointer" onclick="return confirm('Delete this post?')">Delete</button>
-          </form>
-    <% } %>
+            <form method="POST" action="/forum/delete/<%= post._id %>?category=<%= currentCategory %>" class="ml-auto">
+              <button class="text-red-400 text-xs hover:underline cursor-pointer" onclick="return confirm('Delete this post?')">Delete</button>
+            </form>
+          <% } %>
         </div>
-        <div class="text-base leading-relaxed"><%= post.text %></div>
+        <div class="text-base leading-relaxed whitespace-pre-wrap"><%= post.text %></div>
 
         <% (post.files || []).forEach(f => { %>
           <% const filePath = f.includes('/') ? f : 'forum/' + f; %>
@@ -95,7 +88,6 @@
           </div>
         <% }); %>
 
-        <!-- Comment Form -->
         <form method="POST" action="/forum/comment/<%= post._id %>" enctype="multipart/form-data"
               class="flex flex-wrap gap-2 mt-4 items-center bg-black p-4 rounded-lg">
           <input type="hidden" name="category" value="<%= currentCategory %>" />
@@ -103,11 +95,10 @@
                  class="flex-1 px-4 py-2 rounded-lg bg-zinc-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/>
           <input type="text" name="comment" placeholder="Add a comment..."
                  class="flex-[2] px-4 py-2 rounded-lg bg-zinc-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"/>
-          <input type="file" name="files" multiple class="text-white cursor-pointer" />
+          <input type="file" name="files" multiple class="text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-900 file:text-blue-200 hover:file:bg-blue-800" />
           <button type="submit" class="px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-500 transition cursor-pointer">Reply</button>
         </form>
 
-        <!-- Comments List -->
         <div class="mt-4 space-y-2">
           <% (post.comments || []).forEach((c, idx) => { %>
             <div class="bg-zinc-800 p-3 rounded-lg text-sm text-blue-100">
@@ -120,7 +111,7 @@
                 </form>
                 <% } %>
               </div>
-              <div><%= c.comment %></div>
+              <div class="whitespace-pre-wrap"><%= c.comment %></div>
               <% (c.files || []).forEach(f => { %>
                 <% const filePath = f.includes('/') ? f : 'forum/' + f; %>
                 <div class="mt-2 relative">
@@ -139,7 +130,6 @@
       </div>
     <% }); %>
   <% } %>
-
 </main>
 
 <%- include('partials/footer') %>
