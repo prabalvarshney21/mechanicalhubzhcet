@@ -1,4 +1,5 @@
 <%- include('partials/header') %>
+
 <div class="main-container py-12 px-4 max-w-xl mx-auto">
   <h2 class="text-3xl font-semibold mb-6 text-center capitalize">Upload <%= type.toUpperCase() %></h2>
 
@@ -44,12 +45,10 @@
       </select>
     </div>
     
-    <% if (type === 'notes') { %>
-    <div>
+    <div id="unitContainer" class="<%= type !== 'notes' ? 'hidden' : '' %>">
       <label class="block mb-1">Unit (optional)</label>
       <input id="unitInput" type="number" name="unit" min="1" max="10" value="<%= unit||'' %>" placeholder="e.g. 1" class="w-full px-3 py-2 bg-gray-800 text-white rounded"/>
     </div>
-    <% } %>
 
     <div>
       <% if (type === 'syllabus') { %>
@@ -78,8 +77,9 @@
           let filePath = `/uploads/${type}/${year}/${sem}/`;
           if (type !== 'syllabus') {
             filePath += `${encodeURIComponent(subject)}`;
-            if(type === 'notes' && unit) {
-              filePath += `/Unit${unit}`;
+            if(type === 'notes' && unit) { // This logic needs to adapt for labs
+              const subjectIsLab = labCourseNames.includes(subject);
+              if(!subjectIsLab) filePath += `/Unit${unit}`;
             }
           }
           filePath += `/${file}`;
@@ -98,18 +98,37 @@
 <script>
   const semestersData = <%- JSON.stringify(semesters) %>;
   const subjectsData = <%- JSON.stringify(subjects) %>;
+  // ** NEW: Get the list of lab courses from the server **
+  const labCourses = <%- JSON.stringify(labCourseNames) %>;
 
   const yearSelect = document.getElementById('yearSelect');
   const semSelect = document.getElementById('semSelect');
   const subSelect = document.getElementById('subSelect');
+  const unitContainer = document.getElementById('unitContainer');
   const unitInput = document.getElementById('unitInput');
   const showBtn = document.getElementById('showFilesBtn');
+
+  // ** NEW: Function to show/hide the unit field **
+  function toggleUnitField() {
+    if ('<%= type %>' === 'notes') {
+      const selectedSubject = subSelect.value;
+      if (labCourses.includes(selectedSubject)) {
+        unitContainer.style.display = 'none';
+        unitInput.value = ''; // Clear unit value for labs
+      } else {
+        unitContainer.style.display = 'block';
+      }
+    } else {
+      unitContainer.style.display = 'none';
+    }
+  }
 
   function updateShowBtn() {
     const y = yearSelect.value, s = semSelect.value, sub = subSelect.value;
     if (y && s && sub) {
       let url = `/upload?type=<%= type %>&year=${encodeURIComponent(y)}&sem=${encodeURIComponent(s)}&subject=${encodeURIComponent(sub)}`;
-      if (unitInput && unitInput.value) { // Check if unitInput exists
+      // ** UPDATED: Only add unit if it's visible **
+      if (unitContainer.style.display !== 'none' && unitInput.value) {
           url += `&unit=${unitInput.value}`;
       }
       showBtn.href = url;
@@ -127,6 +146,7 @@
         semSelect.appendChild(new Option(s.replace('sem','Sem '), s));
       });
     }
+    toggleUnitField();
     updateShowBtn();
   });
 
@@ -137,13 +157,19 @@
         subSelect.appendChild(new Option(sub, sub));
       });
     }
+    toggleUnitField();
     updateShowBtn();
   });
 
-  subSelect.addEventListener('change', updateShowBtn);
+  subSelect.addEventListener('change', () => {
+      toggleUnitField();
+      updateShowBtn();
+  });
+
   if (unitInput) unitInput.addEventListener('input', updateShowBtn);
 
-  // Initialize on load
+  // Initialize on page load
+  toggleUnitField();
   updateShowBtn();
 </script>
 

@@ -1,42 +1,66 @@
 <%- include('partials/header') %>
 
+<%
+  // Helper function to get an icon based on file extension
+  function getFileIcon(filename) {
+    const ext = filename.split('.').pop().toLowerCase();
+    const iconMap = {
+      'pdf': '📄', 'doc': '📝', 'docx': '📝', 'ppt': '🖥️', 'pptx': '🖥️',
+      'xls': '📊', 'xlsx': '📊', 'png': '🖼️', 'jpg': '🖼️', 'jpeg': '🖼️',
+      'gif': '🖼️', 'zip': '📦', 'rar': '📦',
+    };
+    return iconMap[ext] || '📁'; // Default file icon
+  }
+
+  // Helper function to clean up the filename for display
+  function getCleanFilename(filename) {
+    return filename.substring(0, filename.lastIndexOf('.')) || filename;
+  }
+%>
+
 <section class="hero bg-gradient-to-br from-black to-blue-900 text-white py-16 px-4 text-center">
-  <h1 class="text-4xl lg:text-5xl font-bold mb-4"><%= subject %> — <%= sem.replace('sem', 'Semester ') %> Notes</h1>
-  <p class="text-lg lg:text-xl max-w-3xl mx-auto">Select a unit below to view or download notes for <%= subject %>.</p>
+  <h1 class="text-4xl lg:text-5xl font-bold mb-4"><%= subject %></h1>
+  <p class="text-lg lg:text-xl max-w-3xl mx-auto"><%= year.charAt(0).toUpperCase() + year.slice(1) %> Year — <%= sem.replace('sem', 'Semester ') %></p>
 </section>
 
 <section class="bg-black py-16 px-4">
-  <h2 class="text-3xl font-semibold text-center text-blue-400 mb-12">Select an Option</h2>
-  <div class="max-w-5xl mx-auto flex flex-wrap justify-center gap-8">
-    
-    <% for (let i = 1; i <= 4; i++) { %>
-      <a 
-        href="/notes/<%= year %>/<%= sem %>/<%= encodeURIComponent(subject) %>?unit=<%= i %>" 
-        class="group block w-full sm:w-56 text-center bg-gray-900/50 p-8 rounded-xl border-2 border-blue-900 hover:border-blue-500 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-blue-600/20"
-      >
-        <div class="text-5xl mb-4 transition-transform duration-300 group-hover:scale-110">
-          📁
-        </div>
-        <h3 class="text-2xl font-bold text-white">
-          Unit <%= i %>
-        </h3>
+  <% if (!isLabCourse) { %>
+    <h2 class="text-3xl font-semibold text-center text-blue-400 mb-12">Select an Option</h2>
+    <div class="max-w-5xl mx-auto flex flex-wrap justify-center gap-8">
+      <% for (let i = 1; i <= 4; i++) { %>
+        <a href="/notes/<%= year %>/<%= sem %>/<%= encodeURIComponent(subject) %>?unit=<%= i %>" class="group block w-full sm:w-56 text-center bg-gray-900/50 p-8 rounded-xl border-2 border-blue-900 hover:border-blue-500 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-blue-600/20">
+          <div class="text-5xl mb-4 transition-transform duration-300 group-hover:scale-110">📁</div>
+          <h3 class="text-2xl font-bold text-white">Unit <%= i %></h3>
+        </a>
+      <% } %>
+      <a href="/uploads/syllabus/<%= year %>/<%= sem %>/<%= encodeURIComponent(subject) %>.pdf" target="_blank" class="group block w-full sm:w-56 text-center bg-gray-900/50 p-8 rounded-xl border-2 border-blue-900 hover:border-blue-500 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-blue-600/20">
+        <div class="text-5xl mb-4 transition-transform duration-300 group-hover:scale-110">📜</div>
+        <h3 class="text-2xl font-bold text-white">Syllabus</h3>
       </a>
-    <% } %>
-
-    <a 
-      href="/uploads/syllabus/<%= year %>/<%= sem %>/<%= encodeURIComponent(subject) %>.pdf" 
-      target="_blank"
-      class="group block w-full sm:w-56 text-center bg-gray-900/50 p-8 rounded-xl border-2 border-blue-900 hover:border-blue-500 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-blue-600/20"
-    >
-      <div class="text-5xl mb-4 transition-transform duration-300 group-hover:scale-110">
-        📜
+    </div>
+  <% } else { %>
+    <h2 class="text-3xl font-semibold text-center text-blue-400 mb-12">Available Files</h2>
+    <% if (files.length) { %>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+        <% files.forEach(file => { %>
+          <% const fileUrl = `/uploads/notes/${year}/${sem}/${encodeURIComponent(subject)}/${file}`; %>
+          <div class="bg-gray-900/50 border-2 border-blue-900 rounded-xl p-6 flex flex-col">
+            <div class="flex items-start gap-4">
+              <div class="text-4xl text-blue-300"><%= getFileIcon(file) %></div>
+              <h3 class="text-lg font-semibold text-white flex-1"><%= getCleanFilename(file) %></h3>
+            </div>
+            <div class="flex-grow"></div>
+            <div class="flex items-center gap-3 mt-6">
+              <a href="<%= fileUrl %>" target="_blank" class="flex-1 text-center px-4 py-2 bg-transparent border-2 border-blue-600 rounded-lg hover:bg-blue-600 transition-all">Preview</a>
+              <a href="<%= fileUrl %>" download class="flex-1 text-center px-4 py-2 bg-blue-600 border-2 border-blue-600 rounded-lg hover:bg-blue-500">Download</a>
+            </div>
+          </div>
+        <% }); %>
       </div>
-      <h3 class="text-2xl font-bold text-white">
-        Syllabus
-      </h3>
-    </a>
-
-  </div>
+    <% } else { %>
+      <p class="text-center text-gray-400">No files uploaded yet for this lab.</p>
+    <% } %>
+  <% } %>
 </section>
 
 <%- include('partials/footer') %>

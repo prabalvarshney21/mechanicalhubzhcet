@@ -1,2 +1,5 @@
-node_modules/ 
-.env 
+# Dependencies
+node_modules/
+
+# Application Data
+data/

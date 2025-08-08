@@ -61,12 +61,22 @@ const subjects = {
   sem8: ["Mechanical Vibrations","Manufacturing Technology Lab-III","Vibrations Lab","Energy Conversion Systems Lab","Colloquium","Project (Phase I)","Departmental Elective-2","Open Elective-1","Humanities Elective"],
 };
 
+// **--- NEW: Helper function to identify lab courses ---**
+const labCourseKeywords = ['lab', 'drawing', 'practice', 'training', 'project', 'colloquium', 'vibrations lab'];
+function isLabCourse(subjectName) {
+    const lowerCaseSubject = subjectName.toLowerCase();
+    return labCourseKeywords.some(keyword => lowerCaseSubject.includes(keyword));
+}
+
+
 // --- Multer Setup ---
 const notesStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     const { year, sem, subject, unit } = req.body;
+    const subjectIsLab = isLabCourse(subject);
     const base = path.join(__dirname, 'uploads', 'notes', year, sem, subject);
-    const dir = unit ? path.join(base, 'Unit' + unit) : base;
+    // **--- UPDATED: Don't use Unit folder for labs ---**
+    const dir = unit && !subjectIsLab ? path.join(base, 'Unit' + unit) : base;
     fs.mkdirSync(dir, { recursive: true });
     cb(null, dir);
   },
@@ -85,7 +95,6 @@ const pyqsStorage = multer.diskStorage({
 });
 const uploadPyqs = multer({ storage: pyqsStorage });
 
-// **--- NEW: Multer storage for Syllabus ---**
 const syllabusStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     const { year, sem } = req.body;
@@ -94,7 +103,6 @@ const syllabusStorage = multer.diskStorage({
     cb(null, dir);
   },
   filename: (req, file, cb) => {
-    // Save syllabus with the subject name as the filename
     const subject = req.body.subject;
     const extension = path.extname(file.originalname);
     cb(null, subject + extension);
@@ -176,33 +184,36 @@ app.get('/admin/forum', requireAuth, (req, res) => {
 // --- Upload Routes ---
 app.get('/upload', requireAuth, (req, res) => {
   let { type = 'notes', year, sem, subject, unit, success, error } = req.query;
-  // **--- UPDATED: Add 'syllabus' to allowed types ---**
   if (!['notes', 'pyqs', 'syllabus'].includes(type)) type = 'notes';
   
   let filesList = [];
   if (year && sem && subject) {
     const decodedSubject = decodeURIComponent(subject);
     let dir;
-    // **--- UPDATED: Logic to find syllabus files ---**
     if (type === 'syllabus') {
         dir = path.join(__dirname, 'uploads', 'syllabus', year, sem);
         if (fs.existsSync(dir)) {
-            // Filter to show only the syllabus for the selected subject
             const allSyllabi = fs.readdirSync(dir);
             const targetFile = allSyllabi.find(f => f.startsWith(decodedSubject));
             if(targetFile) filesList.push(targetFile);
         }
     } else {
         const base = path.join(__dirname, 'uploads', type, year, sem, decodedSubject);
-        dir = (type === 'notes' && unit) ? path.join(base, 'Unit' + unit) : base;
+        const subjectIsLab = isLabCourse(decodedSubject);
+        dir = (type === 'notes' && unit && !subjectIsLab) ? path.join(base, 'Unit' + unit) : base;
         if (fs.existsSync(dir)) filesList = fs.readdirSync(dir);
     }
   }
+  
+  // **--- NEW: Pass lab course names to the template ---**
+  const allSubjects = [...new Set(Object.values(subjects).flat())];
+  const labCourseNames = allSubjects.filter(isLabCourse);
+
   res.render('upload', {
     type, year, sem,
     subject: subject ? decodeURIComponent(subject) : '',
     unit, years, semesters, subjects,
-    success, error, filesList
+    success, error, filesList, labCourseNames
   });
 });
 
@@ -211,11 +222,10 @@ app.post('/upload', requireAuth, (req, res) => {
   const { year, sem, subject, unit } = req.body;
 
   let handler;
-  // **--- UPDATED: Route to the correct multer handler ---**
   if (type === 'pyqs') {
     handler = uploadPyqs.array('files');
   } else if (type === 'syllabus') {
-    handler = uploadSyllabus.single('file'); // Syllabus expects a single file
+    handler = uploadSyllabus.single('file'); 
   } else {
     handler = uploadNotes.array('files');
   }
@@ -245,12 +255,12 @@ app.post('/upload/delete', requireAuth, (req, res) => {
   }
 
   let filePath;
-  // **--- UPDATED: Logic to delete syllabus files ---**
   if (type === 'syllabus') {
     filePath = path.join(__dirname, 'uploads', 'syllabus', year, sem, file);
   } else {
     let dir = path.join(__dirname, 'uploads', type, year, sem, subject);
-    if (type === 'notes' && unit) {
+    const subjectIsLab = isLabCourse(subject);
+    if (type === 'notes' && unit && !subjectIsLab) {
       dir = path.join(dir, 'Unit' + unit);
     }
     filePath = path.join(dir, file);
@@ -283,12 +293,31 @@ app.get('/notes/:year/:sem/:subject', (req, res) => {
   if (!years.includes(year) || !semesters[year].includes(sem) || !subjects[sem].includes(subject)) {
     return res.status(404).render('404');
   }
-  if (unit) {
+  
+  const subjectIsLab = isLabCourse(subject);
+
+  // This logic handles clicking a Unit card. For labs, this part is skipped.
+  if (unit && !subjectIsLab) {
     const dir = path.join(__dirname, 'uploads', 'notes', year, sem, subject, 'Unit'+unit);
     const files = fs.existsSync(dir) ? fs.readdirSync(dir) : [];
     return res.render('notes_unit', { year, sem, subject, unit, files, years, semesters });
   }
-  res.render('notes_subject', { year, sem, subject, years, semesters });
+
+  // **--- NEW: Logic for the subject landing page ---**
+  let files = [];
+  if (subjectIsLab) {
+      // For lab courses, pre-fetch the files from the root subject directory
+      const dir = path.join(__dirname, 'uploads', 'notes', year, sem, subject);
+      if (fs.existsSync(dir)) {
+          files = fs.readdirSync(dir);
+      }
+  }
+
+  res.render('notes_subject', {
+      year, sem, subject, years, semesters,
+      isLabCourse: subjectIsLab,
+      files: files
+  });
 });
 
 // --- PYQs Browse ---
