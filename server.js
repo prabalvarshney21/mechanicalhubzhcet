@@ -61,7 +61,6 @@ const subjects = {
   sem8: ["Mechanical Vibrations","Manufacturing Technology Lab-III","Vibrations Lab","Energy Conversion Systems Lab","Colloquium","Project (Phase I)","Departmental Elective-2","Open Elective-1","Humanities Elective"],
 };
 
-// **--- NEW: Helper function to identify lab courses ---**
 const labCourseKeywords = ['lab', 'drawing', 'practice', 'training', 'project', 'colloquium', 'vibrations lab'];
 function isLabCourse(subjectName) {
     const lowerCaseSubject = subjectName.toLowerCase();
@@ -75,7 +74,6 @@ const notesStorage = multer.diskStorage({
     const { year, sem, subject, unit } = req.body;
     const subjectIsLab = isLabCourse(subject);
     const base = path.join(__dirname, 'uploads', 'notes', year, sem, subject);
-    // **--- UPDATED: Don't use Unit folder for labs ---**
     const dir = unit && !subjectIsLab ? path.join(base, 'Unit' + unit) : base;
     fs.mkdirSync(dir, { recursive: true });
     cb(null, dir);
@@ -205,7 +203,6 @@ app.get('/upload', requireAuth, (req, res) => {
     }
   }
   
-  // **--- NEW: Pass lab course names to the template ---**
   const allSubjects = [...new Set(Object.values(subjects).flat())];
   const labCourseNames = allSubjects.filter(isLabCourse);
 
@@ -235,7 +232,8 @@ app.post('/upload', requireAuth, (req, res) => {
       return res.render('upload', {
         type, year, sem, subject, unit,
         years, semesters, subjects,
-        success: null, error: err.message, filesList: []
+        success: null, error: err.message, filesList: [],
+        labCourseNames: []
       });
     }
     const msg = `${type.charAt(0).toUpperCase() + type.slice(1)} uploaded successfully`;
@@ -266,11 +264,23 @@ app.post('/upload/delete', requireAuth, (req, res) => {
     filePath = path.join(dir, file);
   }
   
+  // **--- UPDATED: Smarter delete logic ---**
   if (fs.existsSync(filePath)) {
-    fs.unlinkSync(filePath);
+    try {
+      const stats = fs.statSync(filePath);
+      if (stats.isDirectory()) {
+        // Use rmSync for modern Node.js, which is safer and simpler
+        fs.rmSync(filePath, { recursive: true, force: true });
+      } else {
+        fs.unlinkSync(filePath);
+      }
+    } catch (e) {
+      console.error('Failed to delete:', e);
+      // Optional: redirect with an error message
+    }
   }
   
-  const params = new URLSearchParams({ type, year, sem, subject, unit, success: 'File deleted successfully' });
+  const params = new URLSearchParams({ type, year, sem, subject: encodedSubject, unit, success: 'Item deleted successfully' });
   res.redirect('/upload?' + params.toString());
 });
 
@@ -296,17 +306,14 @@ app.get('/notes/:year/:sem/:subject', (req, res) => {
   
   const subjectIsLab = isLabCourse(subject);
 
-  // This logic handles clicking a Unit card. For labs, this part is skipped.
   if (unit && !subjectIsLab) {
     const dir = path.join(__dirname, 'uploads', 'notes', year, sem, subject, 'Unit'+unit);
     const files = fs.existsSync(dir) ? fs.readdirSync(dir) : [];
     return res.render('notes_unit', { year, sem, subject, unit, files, years, semesters });
   }
 
-  // **--- NEW: Logic for the subject landing page ---**
   let files = [];
   if (subjectIsLab) {
-      // For lab courses, pre-fetch the files from the root subject directory
       const dir = path.join(__dirname, 'uploads', 'notes', year, sem, subject);
       if (fs.existsSync(dir)) {
           files = fs.readdirSync(dir);
