@@ -1,25 +1,77 @@
 <%- include('partials/header') %>
 
 <% if (success) { %>
-  <div id="popup" class="fixed top-5 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded shadow-lg z-50">
+  <div id="popup" class="fixed top-5 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-opacity duration-300">
     <%= success %>
   </div>
+<% } %>
+<% if (error) { %>
+  <div id="popup" class="fixed top-5 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-opacity duration-300">
+    <%= error %>
+  </div>
+<% } %>
+
+<% if (success || error) { %>
   <script>
     setTimeout(() => {
       const popup = document.getElementById('popup');
-      if (popup) popup.remove();
-    }, 3000);
+      if (popup) {
+        popup.style.opacity = '0';
+        setTimeout(() => popup.remove(), 300);
+      }
+    }, 4000);
   </script>
 <% } %>
 
-<div class="bg-black bg-opacity-90 rounded-2xl p-6 max-w-lg mx-auto space-y-4">
-  <h2 class="text-2xl font-semibold">Contact Us</h2>
-  <form action="/contact" method="POST" class="space-y-4">
-    <input type="text" name="name" placeholder="Your Name" class="w-full px-3 py-2 bg-black border border-blue-700 rounded-lg text-blue-200" required>
-    <input type="email" name="email" placeholder="Email" class="w-full px-3 py-2 bg-black border border-blue-700 rounded-lg text-blue-200" required>
-    <textarea name="message" rows="4" placeholder="Message" class="w-full px-3 py-2 bg-black border border-blue-700 rounded-lg text-blue-200" required></textarea>
-    <button type="submit" class="px-6 py-2 bg-blue-800 hover:bg-blue-700 rounded-lg">Send</button>
-  </form>
-</div>
+<section class="hero bg-gradient-to-br from-black to-blue-900 text-white py-16 px-4 text-center">
+  <h1 class="text-4xl lg:text-5xl font-bold mb-4">Contact Us</h1>
+  <p class="text-lg lg:text-xl max-w-3xl mx-auto">We'd love to hear from you. Whether you have a question, feedback, or a suggestion, please reach out.</p>
+</section>
+
+<section class="bg-black py-16 px-4">
+  <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+    
+    <div class="text-white space-y-6">
+      <h2 class="text-3xl font-semibold text-blue-400">Get in Touch</h2>
+      <p class="text-blue-200 leading-relaxed">
+        Use the form to send us a message directly, or connect with us through our official channels. We aim to respond to all queries as soon as possible.
+      </p>
+      
+      <div class="space-y-4">
+        <div class="flex items-center gap-4">
+          <svg class="w-6 h-6 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+          </svg>
+          <a href="mailto:mechanicalhubzhcet@gmail.com" class="hover:text-blue-400 transition-colors">mechanicalhubzhcet@gmail.com</a>
+        </div>
+        
+        <div class="flex items-center gap-4">
+           <svg class="w-6 h-6 text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M16.6 14c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1s-.6.8-.8 1c-.1.2-.3.2-.5.1c-1-1-1.9-1.8-2.8-2.8c-.1-.2-.1-.4.1-.6s.5-.6.6-.8c.1-.2.1-.3 0-.4c0-.1-.8-1.7-.8-1.7c-.1-.2-.2-.2-.4-.2h-.4c-.2 0-.4.1-.6.3c-.2.2-.8.8-.8 1.9c0 1.1.8 2.2 1 2.4c.1.2 1.7 2.6 4.1 3.6c.6.2 1 .4 1.3.5c.5.2 1 .1 1.4-.1c.4-.3.8-.7.8-1.4c0-.7-.2-1.3-.4-1.5c-.2-.2-.4-.3-.6-.4z M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10s10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8s8 3.6 8 8s-3.6 8-8 8z"/>
+           </svg>
+           <a href="https://chat.whatsapp.com/DrjRSdatCGoFuXwmPM0nJH" target="_blank" class="hover:text-blue-400 transition-colors">Join our WhatsApp Group</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-gray-900/50 p-8 rounded-2xl border-2 border-blue-900 shadow-2xl">
+      <form action="/contact" method="POST" class="space-y-5">
+        <div>
+          <label for="name" class="block mb-2 text-sm font-medium text-blue-200">Your Name</label>
+          <input type="text" id="name" name="name" placeholder="John Doe" class="w-full px-4 py-3 bg-black border border-blue-800 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition" required>
+        </div>
+        <div>
+          <label for="email" class="block mb-2 text-sm font-medium text-blue-200">Email Address</label>
+          <input type="email" id="email" name="email" placeholder="you@example.com" class="w-full px-4 py-3 bg-black border border-blue-800 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition" required>
+        </div>
+        <div>
+           <label for="message" class="block mb-2 text-sm font-medium text-blue-200">Message</label>
+          <textarea id="message" name="message" rows="5" placeholder="Let us know how we can help..." class="w-full px-4 py-3 bg-black border border-blue-800 rounded-lg text-white resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition" required></textarea>
+        </div>
+        <button type="submit" class="w-full px-6 py-3 bg-blue-700 hover:bg-blue-600 rounded-lg font-semibold text-lg transition-all duration-300">Send Message</button>
+      </form>
+    </div>
+  </div>
+</section>
 
 <%- include('partials/footer') %>

@@ -1,6 +1,5 @@
 <%- include('partials/header') %>
 
-<!-- Hero Section with Stylish Background and Decorative Blobs -->
 <div class="relative bg-gradient-to-br from-black via-blue-950 to-blue-900 text-white pt-20 pb-14 px-4 text-center overflow-hidden">
   <div class="pointer-events-none absolute top-[-120px] left-[-100px] w-80 h-80 bg-blue-600 opacity-30 rounded-full blur-3xl z-0"></div>
   <div class="pointer-events-none absolute bottom-[-100px] right-[-80px] w-72 h-72 bg-cyan-300 opacity-20 rounded-full blur-2xl z-0"></div>
@@ -11,14 +10,34 @@
     <h1 class="text-4xl sm:text-5xl font-extrabold mb-4 drop-shadow-lg bg-gradient-to-r from-blue-600 via-blue-300 to-cyan-200 bg-clip-text text-transparent tracking-tight">
       Mechanical Hub ZHCET
     </h1>
-    <p class="text-base sm:text-lg mb-6 font-medium text-blue-100 shadow bg-black/40 px-4 py-3 rounded-lg inline-block">
+    <p class="text-base sm:text-lg mb-8 font-medium text-blue-100 shadow bg-black/40 px-4 py-3 rounded-lg inline-block">
       Empowering <span class="text-blue-300 font-semibold">ZHCET mechanical engineering students</span> with curated notes,<br class="hidden sm:block">
       previous year questions, and an interactive forum.
     </p>
+
+    <div class="mt-8 max-w-lg mx-auto">
+      <form action="/search" method="GET" class="relative">
+        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+          <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <input 
+          type="search" 
+          name="q" 
+          required
+          class="block w-full px-4 py-3 pl-11 text-white bg-gray-900/50 border border-blue-800 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition" 
+          placeholder="Search for notes, PYQs, or topics..."
+        >
+        <button type="submit" class="absolute inset-y-0 right-0 px-6 py-2 my-1.5 mr-1.5 text-white bg-blue-700 hover:bg-blue-600 rounded-full text-sm font-semibold">
+          Search
+        </button>
+      </form>
+    </div>
+
   </div>
 </div>
 
-<!-- Vision Section -->
 <section class="vision bg-black text-white py-12 px-4 text-center">
   <div class="max-w-2xl mx-auto px-4 sm:px-6">
     <h2 class="text-2xl sm:text-3xl md:text-4xl font-semibold text-blue-400 mb-4 tracking-tight drop-shadow-lg">Our Vision</h2>
@@ -30,7 +49,6 @@
   </div>
 </section>
 
-<!-- Features Section -->
 <section class="features py-12 px-4 bg-gradient-to-br from-black to-blue-900 text-white">
   <h2 class="text-2xl sm:text-3xl font-semibold text-center text-blue-400 mb-8">Features</h2>
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto px-4 sm:px-6">

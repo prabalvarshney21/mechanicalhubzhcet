@@ -158,6 +158,75 @@ app.post('/contact', (req, res) => {
   res.render('contact', { error: null, success: 'Thank you!' });
 });
 
+// **--- CORRECTED Search Route ---**
+app.get('/search', (req, res) => {
+    const query = (req.query.q || '').trim();
+    const results = {
+        notes: [],
+        pyqs: [],
+        forum: []
+    };
+
+    if (query) {
+        const lowerCaseQuery = query.toLowerCase();
+
+        // Search Notes and PYQs files
+        const uploadsDir = path.join(__dirname, 'uploads');
+        ['notes', 'pyqs'].forEach(type => {
+            const typeDir = path.join(uploadsDir, type);
+            if (!fs.existsSync(typeDir)) return;
+
+            fs.readdirSync(typeDir, { withFileTypes: true }).forEach(yearDirent => {
+                if (!yearDirent.isDirectory()) return;
+                const year = yearDirent.name;
+                const yearDir = path.join(typeDir, year);
+
+                fs.readdirSync(yearDir, { withFileTypes: true }).forEach(semDirent => {
+                    if (!semDirent.isDirectory()) return;
+                    const sem = semDirent.name;
+                    const semDir = path.join(yearDir, sem);
+
+                    fs.readdirSync(semDir, { withFileTypes: true }).forEach(subjectDirent => {
+                        if (!subjectDirent.isDirectory()) return;
+                        const subject = subjectDirent.name;
+                        const subjectDir = path.join(semDir, subject);
+                        
+                        function searchInDir(currentDir) {
+                            if (!fs.existsSync(currentDir)) return;
+                            fs.readdirSync(currentDir, { withFileTypes: true }).forEach(dirent => {
+                                const fullPath = path.join(currentDir, dirent.name);
+                                if (dirent.isDirectory()) {
+                                    searchInDir(fullPath);
+                                } else {
+                                    // **FIX**: Search in filename, subject, sem, and year
+                                    const searchableText = `${dirent.name} ${subject} ${sem} ${year} year`.toLowerCase();
+                                    if (searchableText.includes(lowerCaseQuery)) {
+                                        results[type].push({
+                                            year, sem, subject,
+                                            name: dirent.name,
+                                            path: fullPath.replace(path.join(__dirname, 'uploads'), '').replace(/\\/g, '/')
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                        searchInDir(subjectDir);
+                    });
+                });
+            });
+        });
+
+        // Search Forum
+        results.forum = forumPosts.filter(post => 
+            post.text.toLowerCase().includes(lowerCaseQuery) ||
+            post.username.toLowerCase().includes(lowerCaseQuery)
+        );
+    }
+
+    res.render('search-results', { query, results });
+});
+
+
 // --- Admin Dashboard ---
 app.get('/admin', requireAuth, (req, res) => {
   res.render('admin');
@@ -264,19 +333,16 @@ app.post('/upload/delete', requireAuth, (req, res) => {
     filePath = path.join(dir, file);
   }
   
-  // **--- UPDATED: Smarter delete logic ---**
   if (fs.existsSync(filePath)) {
     try {
       const stats = fs.statSync(filePath);
       if (stats.isDirectory()) {
-        // Use rmSync for modern Node.js, which is safer and simpler
         fs.rmSync(filePath, { recursive: true, force: true });
       } else {
         fs.unlinkSync(filePath);
       }
     } catch (e) {
       console.error('Failed to delete:', e);
-      // Optional: redirect with an error message
     }
   }
   
@@ -329,16 +395,61 @@ app.get('/notes/:year/:sem/:subject', (req, res) => {
 
 // --- PYQs Browse ---
 app.get('/pyqs', (req, res) => res.render('pyqs',{ years, semesters, subjects }));
+
 app.get('/pyqs/:year', (req, res) => {
   const { year } = req.params;
   if (!years.includes(year)) return res.status(404).render('404');
   res.render('pyqs',{ year, years, semesters, subjects });
 });
+
 app.get('/pyqs/:year/:sem', (req, res) => {
-  const { year, sem } = req.params;
-  if (!years.includes(year) || !semesters[year].includes(sem)) return res.status(404).render('404');
-  res.render('pyqs',{ year, sem, years, semesters, subjects });
+    const { year, sem } = req.params;
+    const { exam } = req.query; 
+
+    if (!years.includes(year) || !semesters[year].includes(sem)) {
+        return res.status(404).render('404');
+    }
+
+    if (exam) {
+        const examType = exam === 'midsem' ? 'Mid-Semester' : 'End-Semester';
+        const papersBySubject = [];
+        const subjectsForSem = subjects[sem] || [];
+
+        subjectsForSem.forEach(subject => {
+            const subjectDir = path.join(__dirname, 'uploads', 'pyqs', year, sem, subject);
+            if (fs.existsSync(subjectDir)) {
+                const allFiles = fs.readdirSync(subjectDir);
+                const matchingFiles = allFiles.filter(file => {
+                    const lowerFile = file.toLowerCase();
+                    if (exam === 'midsem') {
+                        return lowerFile.includes('midsem') || lowerFile.includes('mid-sem');
+                    }
+                    if (exam === 'endsem') {
+                        return lowerFile.includes('endsem') || lowerFile.includes('end-sem');
+                    }
+                    return false;
+                });
+
+                if (matchingFiles.length > 0) {
+                    papersBySubject.push({
+                        subjectName: subject,
+                        files: matchingFiles
+                    });
+                }
+            }
+        });
+
+        return res.render('pyqs_subject', {
+            year,
+            sem,
+            examType,
+            papersBySubject,
+        });
+    }
+
+    res.render('pyqs', { year, sem, years, semesters, subjects });
 });
+
 app.get('/pyqs/:year/:sem/:subject', (req, res) => {
   const { year, sem, subject } = req.params;
   if (!years.includes(year) || !semesters[year].includes(sem) || !subjects[sem].includes(subject)) {
@@ -346,7 +457,11 @@ app.get('/pyqs/:year/:sem/:subject', (req, res) => {
   }
   const dir = path.join(__dirname, 'uploads', 'pyqs', year, sem, subject);
   const files = fs.existsSync(dir) ? fs.readdirSync(dir) : [];
-  res.render('pyqs_subject', { year, sem, subject, files, years, semesters, subjects });
+  res.render('pyqs_subject', {
+    year, sem, subject, files,
+    examType: `${subject} Papers`,
+    papersBySubject: [{ subjectName: subject, files: files }]
+  });
 });
 
 // --- Forum Routes ---

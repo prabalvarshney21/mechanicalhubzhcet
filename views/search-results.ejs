@@ -1,0 +1,86 @@
+<%- include('partials/header') %>
+
+<%
+  // Helper function to get an icon based on file extension
+  function getFileIcon(filename) {
+    const ext = filename.split('.').pop().toLowerCase();
+    const iconMap = {
+      'pdf': '📄', 'doc': '📝', 'docx': '📝', 'ppt': '🖥️', 'pptx': '🖥️',
+      'xls': '📊', 'xlsx': '📊', 'png': '🖼️', 'jpg': '🖼️', 'jpeg': '🖼️',
+      'gif': '🖼️', 'zip': '📦', 'rar': '📦',
+    };
+    return iconMap[ext] || '📁'; // Default file icon
+  }
+
+  // Helper function to clean up the filename for display
+  function getCleanFilename(filename) {
+    return filename.substring(0, filename.lastIndexOf('.')) || filename;
+  }
+%>
+
+<section class="hero bg-gradient-to-br from-black to-blue-900 text-white py-16 px-4 text-center">
+  <h1 class="text-3xl lg:text-4xl font-bold mb-4">Search Results</h1>
+  <p class="text-lg lg:text-xl max-w-3xl mx-auto">
+    <% if (query) { %>
+      Showing results for: <span class="font-semibold text-blue-300">"<%= query %>"</span>
+    <% } else { %>
+      Please enter a search term.
+    <% } %>
+  </p>
+</section>
+
+<section class="bg-black text-white py-16 px-4">
+  <div class="max-w-4xl mx-auto">
+
+    <% if (query) { %>
+      <% if (results.notes.length > 0) { %>
+        <div class="mb-12">
+          <h2 class="text-2xl font-semibold text-blue-400 mb-6">📝 Notes</h2>
+          <div class="space-y-4">
+            <% results.notes.forEach(note => { %>
+              <a href="/uploads<%= note.path %>" target="_blank" class="block bg-gray-900/50 p-4 rounded-lg hover:bg-blue-900/30 transition-all">
+                <div class="font-semibold text-blue-200"><%= getCleanFilename(note.name) %></div>
+                <div class="text-sm text-gray-400"><%= note.year %> Year • <%= note.sem.replace('sem', 'Sem ') %> • <%= note.subject %></div>
+              </a>
+            <% }) %>
+          </div>
+        </div>
+      <% } %>
+      
+      <% if (results.pyqs.length > 0) { %>
+        <div class="mb-12">
+          <h2 class="text-2xl font-semibold text-blue-400 mb-6">📚 PYQs</h2>
+          <div class="space-y-4">
+            <% results.pyqs.forEach(pyq => { %>
+              <a href="/uploads<%= pyq.path %>" target="_blank" class="block bg-gray-900/50 p-4 rounded-lg hover:bg-blue-900/30 transition-all">
+                <div class="font-semibold text-blue-200"><%= getCleanFilename(pyq.name) %></div>
+                <div class="text-sm text-gray-400"><%= pyq.year %> Year • <%= pyq.sem.replace('sem', 'Sem ') %> • <%= pyq.subject %></div>
+              </a>
+            <% }) %>
+          </div>
+        </div>
+      <% } %>
+
+      <% if (results.forum.length > 0) { %>
+        <div class="mb-12">
+          <h2 class="text-2xl font-semibold text-blue-400 mb-6">💬 Forum Posts</h2>
+          <div class="space-y-4">
+            <% results.forum.forEach(post => { %>
+              <a href="/forum?category=<%= post.category %>" class="block bg-gray-900/50 p-4 rounded-lg hover:bg-blue-900/30 transition-all">
+                <div class="text-sm text-gray-400">By <%= post.username %> on <%= new Date(post.createdAt).toLocaleDateString() %></div>
+                <div class="font-semibold text-blue-200 mt-1"><%= post.text.substring(0, 150) %>...</div>
+              </a>
+            <% }) %>
+          </div>
+        </div>
+      <% } %>
+
+      <% if (results.notes.length === 0 && results.pyqs.length === 0 && results.forum.length === 0) { %>
+        <p class="text-center text-gray-400 text-xl">No results found for "<%= query %>".</p>
+      <% } %>
+    <% } %>
+
+  </div>
+</section>
+
+<%- include('partials/footer') %>
