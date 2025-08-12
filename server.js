@@ -397,68 +397,62 @@ app.get('/notes/:year/:sem/:subject', (req, res) => {
 // --- PYQs Browse ---
 app.get('/pyqs', (req, res) => res.render('pyqs',{ years, semesters, subjects }));
 
+// **--- UPDATED: Main PYQ route for new Year -> Session flow ---**
 app.get('/pyqs/:year', (req, res) => {
-  const { year } = req.params;
-  if (!years.includes(year)) return res.status(404).render('404');
-  res.render('pyqs',{ year, years, semesters, subjects });
-});
-
-// **--- UPDATED: Main PYQ route for new Academic Year flow ---**
-app.get('/pyqs/:year/:sem', (req, res) => {
-    const { year, sem } = req.params;
+    const { year } = req.params;
     const { session } = req.query; // Check for 'session' query parameter
 
-    if (!years.includes(year) || !semesters[year].includes(sem)) {
+    if (!years.includes(year)) {
         return res.status(404).render('404');
     }
 
-    // If 'session' query is present, find all papers from that year
+    // If 'session' query is present, find all papers from that academic year
     if (session) {
         const academicSession = `${session}-${(parseInt(session.slice(-2)) + 1)}`;
-        const papersBySubject = [];
-        const subjectsForSem = subjects[sem] || [];
+        const papersBySemester = [];
+        const semestersForYear = semesters[year] || [];
 
-        subjectsForSem.forEach(subject => {
-            const subjectDir = path.join(__dirname, 'uploads', 'pyqs', year, sem, subject);
-            if (fs.existsSync(subjectDir)) {
-                const allFiles = fs.readdirSync(subjectDir);
-                // Filter files to find any containing the session year
-                const matchingFiles = allFiles.filter(file => file.includes(session));
+        semestersForYear.forEach(sem => {
+            const papersBySubject = [];
+            const subjectsForSem = subjects[sem] || [];
 
-                if (matchingFiles.length > 0) {
-                    papersBySubject.push({
-                        subjectName: subject,
-                        files: matchingFiles
-                    });
+            subjectsForSem.forEach(subject => {
+                const subjectDir = path.join(__dirname, 'uploads', 'pyqs', year, sem, subject);
+                if (fs.existsSync(subjectDir)) {
+                    const allFiles = fs.readdirSync(subjectDir);
+                    const matchingFiles = allFiles.filter(file => file.includes(session));
+
+                    if (matchingFiles.length > 0) {
+                        papersBySubject.push({ subjectName: subject, files: matchingFiles });
+                    }
                 }
+            });
+
+            if (papersBySubject.length > 0) {
+                papersBySemester.push({
+                    semName: sem,
+                    subjects: papersBySubject
+                });
             }
         });
 
         return res.render('pyqs_subject', {
             year,
-            sem,
             academicSession,
-            papersBySubject,
+            papersBySemester, // Pass new data structure
         });
     }
 
-    // If no 'session' query, render the selection page (pyqs.ejs)
-    res.render('pyqs', { year, sem, years, semesters, subjects });
+    // If no 'session' query, render the session selection page
+    res.render('pyqs', { year, years, semesters, subjects });
 });
 
-// Kept for any old direct links, but not used in the main nav flow
+// These old routes are no longer used in the main navigation but are kept for any direct links
+app.get('/pyqs/:year/:sem', (req, res) => {
+    res.redirect(`/pyqs/${req.params.year}`);
+});
 app.get('/pyqs/:year/:sem/:subject', (req, res) => {
-  const { year, sem, subject } = req.params;
-  if (!years.includes(year) || !semesters[year].includes(sem) || !subjects[sem].includes(subject)) {
-    return res.status(404).render('404');
-  }
-  const dir = path.join(__dirname, 'uploads', 'pyqs', year, sem, subject);
-  const files = fs.existsSync(dir) ? fs.readdirSync(dir) : [];
-  res.render('pyqs_subject', {
-    year, sem, subject,
-    academicSession: `${subject} Papers`,
-    papersBySubject: [{ subjectName: subject, files: files }]
-  });
+    res.redirect(`/pyqs/${req.params.year}`);
 });
 
 // --- Forum Routes ---
