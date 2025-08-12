@@ -18,14 +18,14 @@
 %>
 
 <section class="hero bg-gradient-to-br from-black to-blue-900 text-white py-16 px-4 text-center">
-  <h1 class="text-4xl lg:text-5xl font-bold mb-4"><%= examType %> Papers</h1>
+  <h1 class="text-4xl lg:text-5xl font-bold mb-4">PYQs from <%= academicSession %> Session</h1>
   <p class="text-lg lg:text-xl max-w-3xl mx-auto"><%= year.charAt(0).toUpperCase() + year.slice(1) %> Year — <%= sem.replace('sem', 'Semester ') %></p>
 </section>
 
 <section class="bg-black text-white py-16 px-4">
   <div class="max-w-7xl mx-auto">
     <% if (!papersBySubject || papersBySubject.length === 0) { %>
-      <p class="text-center text-gray-400 text-xl">No PYQs found for this selection.</p>
+      <p class="text-center text-gray-400 text-xl">No PYQs found for this session.</p>
     <% } else { %>
       <% papersBySubject.forEach(subjectData => { %>
         <div class="mb-12">
@@ -56,7 +56,7 @@
 
     <div class="mt-12 text-center">
       <a href="/pyqs/<%= year %>/<%= sem %>" class="px-8 py-3 bg-blue-800 hover:bg-blue-700 rounded-lg text-white font-semibold transition-all">
-         ← Back to Exam Selection
+         ← Back to Session Selection
       </a>
     </div>
   </div>

@@ -35,8 +35,10 @@
         <% }) } %>
       </select>
     </div>
+    
     <div>
       <label class="block mb-1">Subject</label>
+      <input type="text" id="subjectSearch" placeholder="Type to search for a subject..." class="w-full px-3 py-2 mb-2 bg-gray-700 text-white rounded">
       <select name="subject" id="subSelect" class="w-full px-3 py-2 bg-gray-800 text-white rounded" required>
         <option value="">Select Subject</option>
         <% if (sem && subjects[sem]) { subjects[sem].forEach(sub => { %>
@@ -52,7 +54,7 @@
 
     <% if (type === 'pyqs') { %>
       <div class="p-4 text-sm text-yellow-200 bg-yellow-900/50 border-l-4 border-yellow-500 rounded-lg" role="alert">
-        <span class="font-bold">Important:</span> For the filtering to work, please make sure your filenames contain either <code class="bg-black/50 px-1 rounded">'Mid-Sem'</code> or <code class="bg-black/50 px-1 rounded">'End-Sem'</code>.
+        <span class="font-bold">Important:</span> For the new filtering to work, please make sure your filenames contain the relevant academic year (e.g., <code class="bg-black/50 px-1 rounded">'2024'</code>).
       </div>
     <% } %>
 
@@ -109,6 +111,7 @@
   const yearSelect = document.getElementById('yearSelect');
   const semSelect = document.getElementById('semSelect');
   const subSelect = document.getElementById('subSelect');
+  const subjectSearch = document.getElementById('subjectSearch');
   const unitContainer = document.getElementById('unitContainer');
   const unitInput = document.getElementById('unitInput');
   const showBtn = document.getElementById('showFilesBtn');
@@ -144,6 +147,7 @@
   yearSelect.addEventListener('change', () => {
     semSelect.innerHTML = '<option value="">Select Semester</option>';
     subSelect.innerHTML = '<option value="">Select Subject</option>';
+    subjectSearch.value = '';
     if (semestersData[yearSelect.value]) {
       semestersData[yearSelect.value].forEach(s => {
         semSelect.appendChild(new Option(s.replace('sem','Sem '), s));
@@ -155,6 +159,7 @@
 
   semSelect.addEventListener('change', () => {
     subSelect.innerHTML = '<option value="">Select Subject</option>';
+    subjectSearch.value = '';
     if (subjectsData[semSelect.value]) {
       subjectsData[semSelect.value].forEach(sub => {
         subSelect.appendChild(new Option(sub, sub));
@@ -170,6 +175,20 @@
   });
 
   if (unitInput) unitInput.addEventListener('input', updateShowBtn);
+
+  // ** NEW: Logic for searchable subject dropdown **
+  subjectSearch.addEventListener('input', () => {
+    const searchTerm = subjectSearch.value.toLowerCase();
+    const options = subSelect.options;
+    for (let i = 1; i < options.length; i++) { // Start at 1 to skip "Select Subject"
+      const optionText = options[i].text.toLowerCase();
+      if (optionText.includes(searchTerm)) {
+        options[i].style.display = '';
+      } else {
+        options[i].style.display = 'none';
+      }
+    }
+  });
 
   // Initialize on page load
   toggleUnitField();

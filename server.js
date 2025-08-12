@@ -152,13 +152,17 @@ app.post('/login', (req, res) => {
   res.render('login', { error: 'Invalid credentials' });
 });
 app.get('/logout', (req, res) => { req.session.destroy(); res.redirect('/'); });
-app.get('/contact', (req, res) => res.render('contact', { error: null, success: null }));
+
+
+// --- Contact Route ---
 app.post('/contact', (req, res) => {
   console.log('Contact form submission:', req.body);
-  res.render('contact', { error: null, success: 'Thank you!' });
+  res.render('contact', { error: null, success: 'Thank you for your message!' });
 });
+app.get('/contact', (req, res) => res.render('contact', { error: null, success: null }));
 
-// **--- CORRECTED Search Route ---**
+
+// --- Search Route ---
 app.get('/search', (req, res) => {
     const query = (req.query.q || '').trim();
     const results = {
@@ -170,7 +174,6 @@ app.get('/search', (req, res) => {
     if (query) {
         const lowerCaseQuery = query.toLowerCase();
 
-        // Search Notes and PYQs files
         const uploadsDir = path.join(__dirname, 'uploads');
         ['notes', 'pyqs'].forEach(type => {
             const typeDir = path.join(uploadsDir, type);
@@ -198,7 +201,6 @@ app.get('/search', (req, res) => {
                                 if (dirent.isDirectory()) {
                                     searchInDir(fullPath);
                                 } else {
-                                    // **FIX**: Search in filename, subject, sem, and year
                                     const searchableText = `${dirent.name} ${subject} ${sem} ${year} year`.toLowerCase();
                                     if (searchableText.includes(lowerCaseQuery)) {
                                         results[type].push({
@@ -216,7 +218,6 @@ app.get('/search', (req, res) => {
             });
         });
 
-        // Search Forum
         results.forum = forumPosts.filter(post => 
             post.text.toLowerCase().includes(lowerCaseQuery) ||
             post.username.toLowerCase().includes(lowerCaseQuery)
@@ -402,16 +403,18 @@ app.get('/pyqs/:year', (req, res) => {
   res.render('pyqs',{ year, years, semesters, subjects });
 });
 
+// **--- UPDATED: Main PYQ route for new Academic Year flow ---**
 app.get('/pyqs/:year/:sem', (req, res) => {
     const { year, sem } = req.params;
-    const { exam } = req.query; 
+    const { session } = req.query; // Check for 'session' query parameter
 
     if (!years.includes(year) || !semesters[year].includes(sem)) {
         return res.status(404).render('404');
     }
 
-    if (exam) {
-        const examType = exam === 'midsem' ? 'Mid-Semester' : 'End-Semester';
+    // If 'session' query is present, find all papers from that year
+    if (session) {
+        const academicSession = `${session}-${(parseInt(session.slice(-2)) + 1)}`;
         const papersBySubject = [];
         const subjectsForSem = subjects[sem] || [];
 
@@ -419,16 +422,8 @@ app.get('/pyqs/:year/:sem', (req, res) => {
             const subjectDir = path.join(__dirname, 'uploads', 'pyqs', year, sem, subject);
             if (fs.existsSync(subjectDir)) {
                 const allFiles = fs.readdirSync(subjectDir);
-                const matchingFiles = allFiles.filter(file => {
-                    const lowerFile = file.toLowerCase();
-                    if (exam === 'midsem') {
-                        return lowerFile.includes('midsem') || lowerFile.includes('mid-sem');
-                    }
-                    if (exam === 'endsem') {
-                        return lowerFile.includes('endsem') || lowerFile.includes('end-sem');
-                    }
-                    return false;
-                });
+                // Filter files to find any containing the session year
+                const matchingFiles = allFiles.filter(file => file.includes(session));
 
                 if (matchingFiles.length > 0) {
                     papersBySubject.push({
@@ -442,14 +437,16 @@ app.get('/pyqs/:year/:sem', (req, res) => {
         return res.render('pyqs_subject', {
             year,
             sem,
-            examType,
+            academicSession,
             papersBySubject,
         });
     }
 
+    // If no 'session' query, render the selection page (pyqs.ejs)
     res.render('pyqs', { year, sem, years, semesters, subjects });
 });
 
+// Kept for any old direct links, but not used in the main nav flow
 app.get('/pyqs/:year/:sem/:subject', (req, res) => {
   const { year, sem, subject } = req.params;
   if (!years.includes(year) || !semesters[year].includes(sem) || !subjects[sem].includes(subject)) {
@@ -458,8 +455,8 @@ app.get('/pyqs/:year/:sem/:subject', (req, res) => {
   const dir = path.join(__dirname, 'uploads', 'pyqs', year, sem, subject);
   const files = fs.existsSync(dir) ? fs.readdirSync(dir) : [];
   res.render('pyqs_subject', {
-    year, sem, subject, files,
-    examType: `${subject} Papers`,
+    year, sem, subject,
+    academicSession: `${subject} Papers`,
     papersBySubject: [{ subjectName: subject, files: files }]
   });
 });
