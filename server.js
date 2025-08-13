@@ -420,6 +420,7 @@ app.get('/pyqs/:year', (req, res) => {
                 const subjectDir = path.join(__dirname, 'uploads', 'pyqs', year, sem, subject);
                 if (fs.existsSync(subjectDir)) {
                     const allFiles = fs.readdirSync(subjectDir);
+                    // Filter files to find any containing the session year
                     const matchingFiles = allFiles.filter(file => file.includes(session));
 
                     if (matchingFiles.length > 0) {
@@ -447,7 +448,7 @@ app.get('/pyqs/:year', (req, res) => {
     res.render('pyqs', { year, years, semesters, subjects });
 });
 
-// These old routes are no longer used in the main navigation but are kept for any direct links
+// These old routes are now obsolete but redirect for any saved links.
 app.get('/pyqs/:year/:sem', (req, res) => {
     res.redirect(`/pyqs/${req.params.year}`);
 });

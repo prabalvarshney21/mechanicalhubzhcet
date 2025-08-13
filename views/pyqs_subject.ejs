@@ -27,35 +27,30 @@
     <% if (!papersBySemester || papersBySemester.length === 0) { %>
       <p class="text-center text-gray-400 text-xl">No PYQs found for this session.</p>
     <% } else { %>
-      <% papersBySemester.forEach(semesterData => { %>
-        <div class="mb-16">
-          <h2 class="text-4xl font-bold text-blue-300 mb-8 text-center"><%= semesterData.semName.replace('sem', 'Semester ') %></h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% papersBySemester.forEach(semesterData => { %>
           <% semesterData.subjects.forEach(subjectData => { %>
-            <div class="mb-10">
-              <h3 class="text-2xl font-semibold text-blue-400 mb-5 border-b-2 border-blue-800 pb-3">
-                <%= subjectData.subjectName %>
-              </h3>
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <% subjectData.files.forEach(file => { %>
-                  <% const fileUrl = `/uploads/pyqs/${year}/${semesterData.semName.toLowerCase()}/${encodeURIComponent(subjectData.subjectName)}/${file}`; %>
-                  
-                  <div class="bg-gray-900/50 border-2 border-blue-900 rounded-xl p-6 flex flex-col">
-                    <div class="flex items-start gap-4">
-                      <div class="text-4xl text-blue-300"><%= getFileIcon(file) %></div>
-                      <h3 class="text-lg font-semibold text-white flex-1"><%= getCleanFilename(file) %></h3>
+            <% subjectData.files.forEach(file => { %>
+              <% const fileUrl = `/uploads/pyqs/${year}/${semesterData.semName.toLowerCase()}/${encodeURIComponent(subjectData.subjectName)}/${file}`; %>
+              
+              <div class="bg-gray-900/50 border-2 border-blue-900 rounded-xl p-6 flex flex-col">
+                <div class="flex items-start gap-4">
+                  <div class="text-4xl text-blue-300"><%= getFileIcon(file) %></div>
+                  <div class="flex-1">
+                    <h3 class="text-lg font-semibold text-white"><%= getCleanFilename(file) %></h3>
                     </div>
-                    <div class="flex-grow"></div>
-                    <div class="flex items-center gap-3 mt-6">
-                      <a href="<%= fileUrl %>" target="_blank" class="flex-1 text-center px-4 py-2 bg-transparent border-2 border-blue-600 rounded-lg hover:bg-blue-600 transition-all">Preview</a>
-                      <a href="<%= fileUrl %>" download class="flex-1 text-center px-4 py-2 bg-blue-600 border-2 border-blue-600 rounded-lg hover:bg-blue-500">Download</a>
-                    </div>
-                  </div>
-                <% }); %>
+                </div>
+                <div class="flex-grow"></div>
+                <div class="flex items-center gap-3 mt-6">
+                  <a href="<%= fileUrl %>" target="_blank" class="flex-1 text-center px-4 py-2 bg-transparent border-2 border-blue-600 rounded-lg hover:bg-blue-600 transition-all">Preview</a>
+                  <a href="<%= fileUrl %>" download class="flex-1 text-center px-4 py-2 bg-blue-600 border-2 border-blue-600 rounded-lg hover:bg-blue-500">Download</a>
+                </div>
               </div>
-            </div>
+
+            <% }); %>
           <% }); %>
-        </div>
-      <% }); %>
+        <% }); %>
+      </div>
     <% } %>
 
     <div class="mt-12 text-center">
