@@ -17,7 +17,7 @@ if (!fs.existsSync(forumDataPath)) {
 }
 
 const bannerFile = path.join(dataDir, 'banner.json');
-const defaultBannerText = '🚀 New Notes for Sem 5 Released • Join the Forum Now! &nbsp;&nbsp;&nbsp;&nbsp; 📚 PYQs Updated for All Semesters! &nbsp;&nbsp;&nbsp;&nbsp; 💬 Post Your Doubts in the Forum! &nbsp;&nbsp;&nbsp;&nbsp;';
+const defaultBannerText = '噫 New Notes for Sem 5 Released 窶｢ Join the Forum Now! &nbsp;&nbsp;&nbsp;&nbsp; 答 PYQs Updated for All Semesters! &nbsp;&nbsp;&nbsp;&nbsp; 町 Post Your Doubts in the Forum! &nbsp;&nbsp;&nbsp;&nbsp;';
 if (!fs.existsSync(bannerFile)) {
     fs.writeFileSync(bannerFile, JSON.stringify({ text: defaultBannerText }, null, 2));
 }
@@ -87,9 +87,7 @@ const pyqsStorage = multer.diskStorage({
     const { year, sem, subject } = req.body;
     const dir = path.join(__dirname, 'uploads', 'pyqs', year, sem, subject);
     fs.mkdirSync(dir, { recursive: true });
-    cb(null, dir);
-  },
-  filename: (req, file, cb) => cb(null, file.originalname),
+    cb(null, file.originalname),
 });
 const uploadPyqs = multer({ storage: pyqsStorage });
 
@@ -155,10 +153,7 @@ app.get('/logout', (req, res) => { req.session.destroy(); res.redirect('/'); });
 
 
 // --- Contact Route ---
-app.post('/contact', (req, res) => {
-  console.log('Contact form submission:', req.body);
-  res.render('contact', { error: null, success: 'Thank you for your message!' });
-});
+// This route is no longer needed since the form submits directly to Web3Forms
 app.get('/contact', (req, res) => res.render('contact', { error: null, success: null }));
 
 
